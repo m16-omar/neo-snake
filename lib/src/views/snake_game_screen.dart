@@ -95,12 +95,140 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     _dragStart = null;
   }
 
+  Widget _buildHUD(
+    TextStyle monoStyle, {
+    required double cellSize,
+    required bool isLandscape,
+  }) {
+    if (isLandscape) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildHUDItem(
+            'SCORE',
+            '${_controller.score}',
+            monoStyle,
+            CrossAxisAlignment.center,
+          ),
+          const SizedBox(height: 20),
+          _buildHUDItem(
+            'BEST',
+            '${_controller.bestScore}',
+            monoStyle,
+            CrossAxisAlignment.center,
+          ),
+        ],
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+        child: SizedBox(
+          width: min(
+            MediaQuery.of(context).size.width * 0.9,
+            SnakeGameModel.cols * cellSize + 20,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildHUDItem(
+                'SCORE',
+                '${_controller.score}',
+                monoStyle,
+                CrossAxisAlignment.start,
+              ),
+              _buildHUDItem(
+                'BEST',
+                '${_controller.bestScore}',
+                monoStyle,
+                CrossAxisAlignment.end,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildHUDItem(
+    String label,
+    String value,
+    TextStyle monoStyle,
+    CrossAxisAlignment crossAxisAlignment,
+  ) {
+    return Column(
+      crossAxisAlignment: crossAxisAlignment,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: monoStyle.copyWith(
+            color: const Color(0xFF5C8A63),
+            fontSize: 11,
+            letterSpacing: 2,
+          ),
+        ),
+        Text(
+          value,
+          style: monoStyle.copyWith(
+            color: const Color(0xFFD4F7D4),
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            shadows: const [Shadow(color: Color(0x6678DC8C), blurRadius: 6)],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDpad() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(width: 52),
+            DpadButton(label: '▲', onTap: () => _controller.setDir(0, -1)),
+            const SizedBox(width: 52),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            DpadButton(label: '◀', onTap: () => _controller.setDir(-1, 0)),
+            const SizedBox(width: 6),
+            DpadButton(label: '▼', onTap: () => _controller.setDir(0, 1)),
+            const SizedBox(width: 6),
+            DpadButton(label: '▶', onTap: () => _controller.setDir(1, 0)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHint(TextStyle monoStyle) {
+    return Text(
+      'arrow keys / WASD also work',
+      textAlign: TextAlign.center,
+      style: monoStyle.copyWith(
+        color: const Color(0xFF4D7256),
+        fontSize: 11,
+        letterSpacing: 1,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     const monoStyle = TextStyle(
       fontFamily: 'Courier',
       fontFamilyFallback: ['monospace'],
     );
+
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0D1912),
@@ -111,8 +239,18 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
           onKeyEvent: _handleKeyEvent,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final availableHeight = constraints.maxHeight - 260.0;
-              final availableWidth = constraints.maxWidth - 40.0;
+              final double availableHeight;
+              final double availableWidth;
+
+              if (isLandscape) {
+                availableHeight = constraints.maxHeight - 40.0;
+                availableWidth =
+                    constraints.maxWidth - 340.0; // 150px per side + padding
+              } else {
+                availableHeight = constraints.maxHeight - 260.0;
+                availableWidth = constraints.maxWidth - 40.0;
+              }
+
               final widthCellSize = availableWidth / SnakeGameModel.cols;
               final heightCellSize = availableHeight / SnakeGameModel.rows;
               final cellSize = min(
@@ -120,278 +258,187 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                 min(widthCellSize, heightCellSize),
               ).clamp(12.0, 26.0);
 
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // HUD
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0,
-                      vertical: 8.0,
+              final gameBoard = Center(
+                child: Container(
+                  padding: const EdgeInsets.all(10.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(22.0),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF173324), Color(0xFF0F2318)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
-                    child: SizedBox(
-                      width: min(
-                        MediaQuery.of(context).size.width * 0.9,
-                        SnakeGameModel.cols * cellSize + 20,
+                    boxShadow: [
+                      const BoxShadow(
+                        color: Color(0xFF86E0C4),
+                        spreadRadius: 3,
+                        blurRadius: 0,
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'SCORE',
-                                style: monoStyle.copyWith(
-                                  color: const Color(0xFF5C8A63),
-                                  fontSize: 11,
-                                  letterSpacing: 2,
-                                ),
-                              ),
-                              Text(
-                                '${_controller.score}',
-                                style: monoStyle.copyWith(
-                                  color: const Color(0xFFD4F7D4),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  shadows: const [
-                                    Shadow(
-                                      color: Color(0x6678DC8C),
-                                      blurRadius: 6,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                'BEST',
-                                style: monoStyle.copyWith(
-                                  color: const Color(0xFF5C8A63),
-                                  fontSize: 11,
-                                  letterSpacing: 2,
-                                ),
-                              ),
-                              Text(
-                                '${_controller.bestScore}',
-                                style: monoStyle.copyWith(
-                                  color: const Color(0xFFD4F7D4),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  shadows: const [
-                                    Shadow(
-                                      color: Color(0x6678DC8C),
-                                      blurRadius: 6,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                      const BoxShadow(
+                        color: Color(0xFF0A1811),
+                        spreadRadius: 1,
+                        blurRadius: 0,
                       ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  // Game Board Container
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(22.0),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF173324), Color(0xFF0F2318)],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                        boxShadow: [
-                          const BoxShadow(
-                            color: Color(0xFF86E0C4),
-                            spreadRadius: 3,
-                            blurRadius: 0,
-                          ),
-                          const BoxShadow(
-                            color: Color(0xFF0A1811),
-                            spreadRadius: 1,
-                            blurRadius: 0,
-                          ),
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.6),
-                            blurRadius: 24,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          GestureDetector(
-                            onPanStart: _handlePanStart,
-                            onPanUpdate: _handlePanUpdate,
-                            onPanEnd: _handlePanEnd,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12.0),
-                              child: CustomPaint(
-                                size: Size(
-                                  SnakeGameModel.cols * cellSize,
-                                  SnakeGameModel.rows * cellSize,
-                                ),
-                                painter: SnakeBoardPainter(
-                                  snake: _controller.snake,
-                                  apple: _controller.apple,
-                                  dir: _controller.dir,
-                                  cellSize: cellSize,
-                                  cols: SnakeGameModel.cols,
-                                  rows: SnakeGameModel.rows,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          // Ready / Game Over Overlays
-                          if (!_controller.isRunning)
-                            Positioned.fill(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12.0),
-                                child: Container(
-                                  color: const Color(0xDC08140C),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        _controller.isAlive
-                                            ? 'READY?'
-                                            : 'GAME OVER',
-                                        style: monoStyle.copyWith(
-                                          color: const Color(0xFFFF8A6B),
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 3,
-                                          shadows: const [
-                                            Shadow(
-                                              color: Color(0x80FF785A),
-                                              blurRadius: 10,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16.0,
-                                        ),
-                                        child: Text(
-                                          _controller.isAlive
-                                              ? 'Use arrow keys, swipe, or the pad below'
-                                              : 'Score: ${_controller.score}${_controller.score >= _controller.bestScore && _controller.score > 0 ? '  •  new best!' : ''}',
-                                          textAlign: TextAlign.center,
-                                          style: monoStyle.copyWith(
-                                            color: const Color(0xFF8FC99A),
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 18),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          _controller.startGame();
-                                          _focusNode.requestFocus();
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(
-                                            0xFF86E0C4,
-                                          ),
-                                          foregroundColor: const Color(
-                                            0xFF0D2318,
-                                          ),
-                                          elevation: 0,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 22,
-                                            vertical: 10,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          _controller.isAlive
-                                              ? 'PLAY'
-                                              : 'PLAY AGAIN',
-                                          style: monoStyle.copyWith(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 1,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  // Gamepad D-pad controls
-                  Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(width: 52),
-                          DpadButton(
-                            label: '▲',
-                            onTap: () => _controller.setDir(0, -1),
-                          ),
-                          const SizedBox(width: 52),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          DpadButton(
-                            label: '◀',
-                            onTap: () => _controller.setDir(-1, 0),
-                          ),
-                          const SizedBox(width: 6),
-                          DpadButton(
-                            label: '▼',
-                            onTap: () => _controller.setDir(0, 1),
-                          ),
-                          const SizedBox(width: 6),
-                          DpadButton(
-                            label: '▶',
-                            onTap: () => _controller.setDir(1, 0),
-                          ),
-                        ],
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.6),
+                        blurRadius: 24,
+                        offset: const Offset(0, 10),
                       ),
                     ],
                   ),
+                  child: Stack(
+                    children: [
+                      GestureDetector(
+                        onPanStart: _handlePanStart,
+                        onPanUpdate: _handlePanUpdate,
+                        onPanEnd: _handlePanEnd,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12.0),
+                          child: CustomPaint(
+                            size: Size(
+                              SnakeGameModel.cols * cellSize,
+                              SnakeGameModel.rows * cellSize,
+                            ),
+                            painter: SnakeBoardPainter(
+                              snake: _controller.snake,
+                              apple: _controller.apple,
+                              dir: _controller.dir,
+                              cellSize: cellSize,
+                              cols: SnakeGameModel.cols,
+                              rows: SnakeGameModel.rows,
+                            ),
+                          ),
+                        ),
+                      ),
 
-                  const SizedBox(height: 14),
-
-                  // Hint
-                  Text(
-                    'arrow keys / WASD also work',
-                    style: monoStyle.copyWith(
-                      color: const Color(0xFF4D7256),
-                      fontSize: 11,
-                      letterSpacing: 1,
-                    ),
+                      // Ready / Game Over Overlays
+                      if (!_controller.isRunning)
+                        Positioned.fill(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12.0),
+                            child: Container(
+                              color: const Color(0xDC08140C),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    _controller.isAlive
+                                        ? 'READY?'
+                                        : 'GAME OVER',
+                                    style: monoStyle.copyWith(
+                                      color: const Color(0xFFFF8A6B),
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 3,
+                                      shadows: const [
+                                        Shadow(
+                                          color: Color(0x80FF785A),
+                                          blurRadius: 10,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0,
+                                    ),
+                                    child: Text(
+                                      _controller.isAlive
+                                          ? 'Use arrow keys, swipe, or the pad below'
+                                          : 'Score: ${_controller.score}${_controller.score >= _controller.bestScore && _controller.score > 0 ? '  •  new best!' : ''}',
+                                      textAlign: TextAlign.center,
+                                      style: monoStyle.copyWith(
+                                        color: const Color(0xFF8FC99A),
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 18),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      _controller.startGame();
+                                      _focusNode.requestFocus();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF86E0C4),
+                                      foregroundColor: const Color(0xFF0D2318),
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 22,
+                                        vertical: 10,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      _controller.isAlive
+                                          ? 'PLAY'
+                                          : 'PLAY AGAIN',
+                                      style: monoStyle.copyWith(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                ],
+                ),
               );
+
+              if (isLandscape) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Left Column: HUD & Hint
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildHUD(
+                            monoStyle,
+                            cellSize: cellSize,
+                            isLandscape: true,
+                          ),
+                          const SizedBox(height: 24),
+                          _buildHint(monoStyle),
+                        ],
+                      ),
+                    ),
+
+                    // Center Column: Game Board
+                    gameBoard,
+
+                    // Right Column: D-pad controls
+                    Expanded(child: Center(child: _buildDpad())),
+                  ],
+                );
+              } else {
+                // Portrait Layout
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildHUD(
+                      monoStyle,
+                      cellSize: cellSize,
+                      isLandscape: false,
+                    ),
+                    const SizedBox(height: 14),
+                    gameBoard,
+                    const SizedBox(height: 18),
+                    _buildDpad(),
+                    const SizedBox(height: 14),
+                    _buildHint(monoStyle),
+                  ],
+                );
+              }
             },
           ),
         ),
