@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../controllers/snake_game_controller.dart';
-import '../models/snake_game_model.dart';
 import 'widgets/snake_board_painter.dart';
 import 'widgets/dpad_button.dart';
 
@@ -126,7 +125,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
         child: SizedBox(
           width: min(
             MediaQuery.of(context).size.width * 0.9,
-            SnakeGameModel.cols * cellSize + 20,
+            _controller.cols * cellSize + 20,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -181,27 +180,43 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     );
   }
 
-  Widget _buildDpad() {
+  Widget _buildDpad({double size = 52.0}) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(width: 52),
-            DpadButton(label: '▲', onTap: () => _controller.setDir(0, -1)),
-            const SizedBox(width: 52),
+            SizedBox(width: size),
+            DpadButton(
+              size: size,
+              label: '▲',
+              onTap: () => _controller.setDir(0, -1),
+            ),
+            SizedBox(width: size),
           ],
         ),
         const SizedBox(height: 6),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            DpadButton(label: '◀', onTap: () => _controller.setDir(-1, 0)),
+            DpadButton(
+              size: size,
+              label: '◀',
+              onTap: () => _controller.setDir(-1, 0),
+            ),
             const SizedBox(width: 6),
-            DpadButton(label: '▼', onTap: () => _controller.setDir(0, 1)),
+            DpadButton(
+              size: size,
+              label: '▼',
+              onTap: () => _controller.setDir(0, 1),
+            ),
             const SizedBox(width: 6),
-            DpadButton(label: '▶', onTap: () => _controller.setDir(1, 0)),
+            DpadButton(
+              size: size,
+              label: '▶',
+              onTap: () => _controller.setDir(1, 0),
+            ),
           ],
         ),
       ],
@@ -229,6 +244,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
 
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
+    _controller.updateOrientation(isLandscape);
 
     return Scaffold(
       backgroundColor: const Color(0xFF0D1912),
@@ -244,15 +260,14 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
 
               if (isLandscape) {
                 availableHeight = constraints.maxHeight - 40.0;
-                availableWidth =
-                    constraints.maxWidth - 340.0; // 150px per side + padding
+                availableWidth = constraints.maxWidth * 0.6 - 40.0;
               } else {
                 availableHeight = constraints.maxHeight - 260.0;
                 availableWidth = constraints.maxWidth - 40.0;
               }
 
-              final widthCellSize = availableWidth / SnakeGameModel.cols;
-              final heightCellSize = availableHeight / SnakeGameModel.rows;
+              final widthCellSize = availableWidth / _controller.cols;
+              final heightCellSize = availableHeight / _controller.rows;
               final cellSize = min(
                 26.0,
                 min(widthCellSize, heightCellSize),
@@ -296,16 +311,16 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                           borderRadius: BorderRadius.circular(12.0),
                           child: CustomPaint(
                             size: Size(
-                              SnakeGameModel.cols * cellSize,
-                              SnakeGameModel.rows * cellSize,
+                              _controller.cols * cellSize,
+                              _controller.rows * cellSize,
                             ),
                             painter: SnakeBoardPainter(
                               snake: _controller.snake,
                               apple: _controller.apple,
                               dir: _controller.dir,
                               cellSize: cellSize,
-                              cols: SnakeGameModel.cols,
-                              rows: SnakeGameModel.rows,
+                              cols: _controller.cols,
+                              rows: _controller.rows,
                             ),
                           ),
                         ),
@@ -395,10 +410,10 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
 
               if (isLandscape) {
                 return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Left Column: HUD & Hint
+                    // Left Column: HUD, D-pad & Hint
                     Expanded(
+                      flex: 4,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -407,17 +422,16 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                             cellSize: cellSize,
                             isLandscape: true,
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16),
+                          _buildDpad(size: 48.0),
+                          const SizedBox(height: 16),
                           _buildHint(monoStyle),
                         ],
                       ),
                     ),
 
-                    // Center Column: Game Board
-                    gameBoard,
-
-                    // Right Column: D-pad controls
-                    Expanded(child: Center(child: _buildDpad())),
+                    // Right Column: Game Board
+                    Expanded(flex: 6, child: Center(child: gameBoard)),
                   ],
                 );
               } else {

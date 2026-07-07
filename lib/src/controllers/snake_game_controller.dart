@@ -24,6 +24,8 @@ class SnakeGameController extends ChangeNotifier {
   bool get isRunning => _model.isRunning;
   bool get isAlive => _model.isAlive;
   int get tickMs => _model.tickMs;
+  int get cols => _model.cols;
+  int get rows => _model.rows;
 
   @override
   void dispose() {
@@ -51,7 +53,13 @@ class SnakeGameController extends ChangeNotifier {
   }
 
   void reset() {
-    _model.snake = [const Point(7, 10), const Point(6, 10), const Point(5, 10)];
+    final startX = _model.cols ~/ 2;
+    final startY = _model.rows ~/ 2;
+    _model.snake = [
+      Point(startX, startY),
+      Point(startX - 1, startY),
+      Point(startX - 2, startY),
+    ];
     _model.dir = const Point(1, 0);
     _model.nextDir = const Point(1, 0);
     _model.score = 0;
@@ -67,10 +75,20 @@ class SnakeGameController extends ChangeNotifier {
     bool valid = false;
     while (!valid) {
       _model.apple = Point(
-        rand.nextInt(SnakeGameModel.cols),
-        rand.nextInt(SnakeGameModel.rows),
+        rand.nextInt(_model.cols),
+        rand.nextInt(_model.rows),
       );
       valid = !_model.snake.any((segment) => segment == _model.apple);
+    }
+  }
+
+  void updateOrientation(bool isLandscape) {
+    final newCols = isLandscape ? 20 : 15;
+    final newRows = isLandscape ? 15 : 20;
+    if (_model.cols != newCols || _model.rows != newRows) {
+      _model.cols = newCols;
+      _model.rows = newRows;
+      reset();
     }
   }
 
@@ -103,9 +121,9 @@ class SnakeGameController extends ChangeNotifier {
 
     // Wall collision
     if (newHead.x < 0 ||
-        newHead.x >= SnakeGameModel.cols ||
+        newHead.x >= _model.cols ||
         newHead.y < 0 ||
-        newHead.y >= SnakeGameModel.rows) {
+        newHead.y >= _model.rows) {
       _gameOver();
       return;
     }
