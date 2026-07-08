@@ -458,7 +458,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                 availableHeight = constraints.maxHeight - 70.0;
                 availableWidth = constraints.maxWidth * 0.7 - 40.0;
               } else {
-                availableHeight = constraints.maxHeight - 320.0;
+                availableHeight = constraints.maxHeight - 390.0;
                 availableWidth = constraints.maxWidth - 40.0;
               }
 
@@ -658,74 +658,60 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    // ── Compact unified top bar ──────────────────────────
+                    // ── Row 1: Back button + title ────────────────────────
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16.0,
-                        vertical: 6.0,
+                        vertical: 4.0,
                       ),
                       child: Row(
                         children: [
                           _buildBackButton(),
-                          const SizedBox(width: 8),
-                          // Score
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'SCORE',
-                                style: monoStyle.copyWith(
-                                  color: const Color(0xFF5C8A63),
-                                  fontSize: 9,
-                                  letterSpacing: 1.5,
-                                ),
-                              ),
-                              Text(
-                                '${_controller.score}',
-                                style: monoStyle.copyWith(
-                                  color: const Color(0xFFD4F7D4),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          // Title (centred)
                           Expanded(
                             child: Text(
                               'NEON SNAKE',
                               textAlign: TextAlign.center,
                               style: monoStyle.copyWith(
                                 color: const Color(0xFF86E0C4),
-                                fontSize: 13,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 2,
                               ),
                             ),
                           ),
-                          // Best
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'BEST',
-                                style: monoStyle.copyWith(
-                                  color: const Color(0xFF5C8A63),
-                                  fontSize: 9,
-                                  letterSpacing: 1.5,
-                                ),
-                              ),
-                              Text(
-                                '${_controller.bestScore}',
-                                style: monoStyle.copyWith(
-                                  color: const Color(0xFFFFD700),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
+                          const SizedBox(width: 38), // balance back button
+                        ],
+                      ),
+                    ),
+                    // ── Row 2: Stats bar (LENGTH · FOOD · TIME · BEST) ────
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: _buildTopBar(monoStyle),
+                    ),
+                    // ── Row 3: SCORE + LEVEL secondary bar ────────────────
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 4.0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildTopBarItem(
+                            icon: Icons.bar_chart,
+                            iconColor: const Color(0xFF86E0C4),
+                            label: 'SCORE',
+                            value: '${_controller.score}',
+                            valueColor: const Color(0xFF86E0C4),
+                            monoStyle: monoStyle,
+                          ),
+                          _buildTopBarItem(
+                            icon: Icons.star,
+                            iconColor: const Color(0xFFFFD700),
+                            label: 'LEVEL',
+                            value: 'Level ${_controller.level}',
+                            valueColor: const Color(0xFFFFD700),
+                            monoStyle: monoStyle,
                           ),
                         ],
                       ),
