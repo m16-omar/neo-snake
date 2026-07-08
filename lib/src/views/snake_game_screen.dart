@@ -667,51 +667,59 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                       ),
                       child: Row(
                         children: [
-                          // Back button
+                          // Back button (left anchor)
                           _buildBackButton(),
-                          const SizedBox(width: 6),
-                          // Score
-                          _buildTopBarItem(
-                            icon: Icons.bar_chart,
-                            iconColor: const Color(0xFF86E0C4),
-                            label: 'SCORE',
-                            value: '${_controller.score}',
-                            valueColor: const Color(0xFF86E0C4),
-                            monoStyle: monoStyle,
+                          // Stats centred in remaining space
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildTopBarItem(
+                                  icon: Icons.bar_chart,
+                                  iconColor: const Color(0xFF86E0C4),
+                                  label: 'SCORE',
+                                  value: '${_controller.score}',
+                                  valueColor: const Color(0xFF86E0C4),
+                                  monoStyle: monoStyle,
+                                ),
+                                const SizedBox(width: 6),
+                                _buildVerticalDivider(),
+                                const SizedBox(width: 6),
+                                _buildTopBarItem(
+                                  icon: Icons.apple,
+                                  iconColor: const Color(0xFFE6402F),
+                                  label: 'FOOD',
+                                  value: '${_controller.foodEaten}',
+                                  valueColor: const Color(0xFFE6402F),
+                                  monoStyle: monoStyle,
+                                ),
+                                const SizedBox(width: 6),
+                                _buildVerticalDivider(),
+                                const SizedBox(width: 6),
+                                _buildTopBarItem(
+                                  icon: Icons.star,
+                                  iconColor: const Color(0xFFFFD700),
+                                  label: 'LVL',
+                                  value: '${_controller.level}',
+                                  valueColor: const Color(0xFFFFD700),
+                                  monoStyle: monoStyle,
+                                ),
+                                const SizedBox(width: 6),
+                                _buildVerticalDivider(),
+                                const SizedBox(width: 6),
+                                _buildTopBarItem(
+                                  icon: Icons.emoji_events,
+                                  iconColor: const Color(0xFFFFD700),
+                                  label: 'BEST',
+                                  value: '${_controller.bestScore}',
+                                  valueColor: const Color(0xFFFFD700),
+                                  monoStyle: monoStyle,
+                                ),
+                              ],
+                            ),
                           ),
-                          _buildVerticalDivider(),
-                          const SizedBox(width: 6),
-                          // Food eaten
-                          _buildTopBarItem(
-                            icon: Icons.apple,
-                            iconColor: const Color(0xFFE6402F),
-                            label: 'FOOD',
-                            value: '${_controller.foodEaten}',
-                            valueColor: const Color(0xFFE6402F),
-                            monoStyle: monoStyle,
-                          ),
-                          _buildVerticalDivider(),
-                          const SizedBox(width: 6),
-                          // Level
-                          _buildTopBarItem(
-                            icon: Icons.star,
-                            iconColor: const Color(0xFFFFD700),
-                            label: 'LVL',
-                            value: '${_controller.level}',
-                            valueColor: const Color(0xFFFFD700),
-                            monoStyle: monoStyle,
-                          ),
-                          _buildVerticalDivider(),
-                          const SizedBox(width: 6),
-                          // Best
-                          _buildTopBarItem(
-                            icon: Icons.emoji_events,
-                            iconColor: const Color(0xFFFFD700),
-                            label: 'BEST',
-                            value: '${_controller.bestScore}',
-                            valueColor: const Color(0xFFFFD700),
-                            monoStyle: monoStyle,
-                          ),
+                          // Balancing spacer = back button width
+                          const SizedBox(width: 38),
                         ],
                       ),
                     ),
