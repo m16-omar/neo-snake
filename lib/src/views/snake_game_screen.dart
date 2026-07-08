@@ -223,10 +223,17 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     required String value,
     required Color valueColor,
     Widget? trailing,
+    bool compact = false,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
+      margin: EdgeInsets.symmetric(
+        horizontal: 12.0,
+        vertical: compact ? 1.5 : 2.0,
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: 10.0,
+        vertical: compact ? 3.0 : 5.0,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFF14241B),
         borderRadius: BorderRadius.circular(10.0),
@@ -234,8 +241,8 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
       ),
       child: Row(
         children: [
-          Icon(icon, color: iconColor, size: 20),
-          const SizedBox(width: 10),
+          Icon(icon, color: iconColor, size: compact ? 16 : 20),
+          SizedBox(width: compact ? 8 : 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,9 +250,9 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
-                    color: Color(0xFF5C8A63),
-                    fontSize: 9,
+                  style: TextStyle(
+                    color: const Color(0xFF5C8A63),
+                    fontSize: compact ? 8 : 9,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.0,
                   ),
@@ -254,7 +261,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                   value,
                   style: TextStyle(
                     color: valueColor,
-                    fontSize: 15,
+                    fontSize: compact ? 12 : 15,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -277,6 +284,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
           label: 'BEST SCORE',
           value: '${_controller.bestScore}',
           valueColor: const Color(0xFFFFD700),
+          compact: true,
         ),
         _buildSideCard(
           icon: Icons.bar_chart,
@@ -284,6 +292,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
           label: 'SCORE',
           value: '${_controller.score}',
           valueColor: const Color(0xFF86E0C4),
+          compact: true,
         ),
         _buildSideCard(
           icon: Icons.apple,
@@ -291,6 +300,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
           label: 'FOOD EATEN',
           value: '${_controller.foodEaten}',
           valueColor: const Color(0xFFE6402F),
+          compact: true,
         ),
         _buildSideCard(
           icon: Icons.star,
@@ -298,11 +308,12 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
           label: 'LEVEL',
           value: 'Level ${_controller.level}',
           valueColor: const Color(0xFF86E0C4),
+          compact: true,
         ),
-        const SizedBox(height: 6),
-        _buildPauseButton(monoStyle),
-        const SizedBox(height: 6),
-        _buildDpad(size: 38.0),
+        const SizedBox(height: 4),
+        _buildPauseButton(monoStyle, compact: true),
+        const SizedBox(height: 4),
+        _buildDpad(size: 30.0),
       ],
     );
   }
@@ -371,11 +382,11 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     );
   }
 
-  Widget _buildPauseButton(TextStyle monoStyle) {
+  Widget _buildPauseButton(TextStyle monoStyle, {bool compact = false}) {
     final isPaused = _controller.isPaused;
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      margin: EdgeInsets.symmetric(horizontal: compact ? 12.0 : 16.0),
       child: OutlinedButton.icon(
         onPressed: () {
           _controller.togglePause();
@@ -384,7 +395,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
         style: OutlinedButton.styleFrom(
           backgroundColor: const Color(0xFF14241B),
           side: const BorderSide(color: Color(0x3386E0C4), width: 1.5),
-          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          padding: EdgeInsets.symmetric(vertical: compact ? 5.0 : 10.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
@@ -392,13 +403,13 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
         icon: Icon(
           isPaused ? Icons.play_arrow : Icons.pause,
           color: const Color(0xFF86E0C4),
-          size: 16,
+          size: compact ? 14 : 16,
         ),
         label: Text(
           isPaused ? 'RESUME' : 'PAUSE',
           style: monoStyle.copyWith(
             color: const Color(0xFF86E0C4),
-            fontSize: 13,
+            fontSize: compact ? 11 : 13,
             fontWeight: FontWeight.bold,
             letterSpacing: 2,
           ),
