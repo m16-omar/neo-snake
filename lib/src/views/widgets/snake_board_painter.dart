@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 class SnakeBoardPainter extends CustomPainter {
   final List<Point<int>> snake;
-  final Point<int> apple;
+  final List<Point<int>> apples;
+  final List<Point<int>> obstacles;
   final Point<int> dir;
   final double cellSize;
   final int cols;
@@ -12,7 +13,8 @@ class SnakeBoardPainter extends CustomPainter {
 
   SnakeBoardPainter({
     required this.snake,
-    required this.apple,
+    required this.apples,
+    required this.obstacles,
     required this.dir,
     required this.cellSize,
     required this.cols,
@@ -39,8 +41,50 @@ class SnakeBoardPainter extends CustomPainter {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
     }
 
-    // Draw Apple
-    if (snake.isNotEmpty) {
+    // Draw Obstacles
+    final stoneColor = const Color(0xFF757575);
+    final stoneDark = const Color(0xFF424242);
+    final stoneLight = const Color(0xFFBDBDBD);
+    for (final obs in obstacles) {
+      final px = obs.x * cellSize;
+      final py = obs.y * cellSize;
+      final pad = 2.0;
+      final rect = Rect.fromLTWH(
+        px + pad,
+        py + pad,
+        cellSize - pad * 2,
+        cellSize - pad * 2,
+      );
+      final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(5));
+
+      final stonePaint = Paint()..color = stoneColor;
+      canvas.drawRRect(rrect, stonePaint);
+
+      // Dark border
+      final strokePaint = Paint()
+        ..color = stoneDark
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5;
+      canvas.drawRRect(rrect, strokePaint);
+
+      // Light bevel highlights
+      final linePaint = Paint()
+        ..color = stoneLight
+        ..strokeWidth = 1.0;
+      canvas.drawLine(
+        Offset(px + pad + 2, py + pad + 2),
+        Offset(px + cellSize - pad - 2, py + pad + 2),
+        linePaint,
+      );
+      canvas.drawLine(
+        Offset(px + pad + 2, py + pad + 2),
+        Offset(px + pad + 2, py + cellSize - pad - 2),
+        linePaint,
+      );
+    }
+
+    // Draw Apples
+    for (final apple in apples) {
       final cx = (apple.x + 0.5) * cellSize;
       final cy = (apple.y + 0.5) * cellSize;
       final r = cellSize * 0.36;
@@ -186,7 +230,8 @@ class SnakeBoardPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant SnakeBoardPainter oldDelegate) {
     return oldDelegate.snake != snake ||
-        oldDelegate.apple != apple ||
+        oldDelegate.apples != apples ||
+        oldDelegate.obstacles != obstacles ||
         oldDelegate.dir != dir ||
         oldDelegate.cellSize != cellSize;
   }

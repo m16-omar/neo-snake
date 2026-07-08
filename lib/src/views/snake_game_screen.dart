@@ -94,85 +94,240 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     _dragStart = null;
   }
 
-  Widget _buildLandscapeHUD(TextStyle monoStyle) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
-      padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFF14241B),
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: const Color(0x3386E0C4), width: 1.5),
+  String _formatTime(int totalSeconds) {
+    final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
+    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
+  Widget _buildBackButton() {
+    return InkWell(
+      onTap: () => Navigator.of(context).maybePop(),
+      borderRadius: BorderRadius.circular(8.0),
+      child: Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          color: const Color(0xFF14241B),
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(color: const Color(0x3386E0C4), width: 1.5),
+        ),
+        child: const Icon(Icons.arrow_back, color: Color(0xFF86E0C4), size: 18),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+    );
+  }
+
+  Widget _buildTopBar(TextStyle monoStyle) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0D1912),
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(color: const Color(0x1A86E0C4), width: 1.2),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // Best Score Row
-          Row(
-            children: [
-              const Icon(
-                Icons.emoji_events,
-                color: Color(0xFFFFD700), // Gold Trophy
-                size: 22,
-              ),
-              const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'BEST',
-                    style: monoStyle.copyWith(
-                      color: const Color(0xFF5C8A63),
-                      fontSize: 10,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                  Text(
-                    '${_controller.bestScore}',
-                    style: monoStyle.copyWith(
-                      color: const Color(0xFFFFD700),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+          // Length
+          _buildTopBarItem(
+            icon: Icons.gesture,
+            iconColor: const Color(0xFF8BC34A),
+            label: 'LENGTH',
+            value: '${_controller.snake.length}',
+            valueColor: const Color(0xFF8BC34A),
+            monoStyle: monoStyle,
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: Divider(color: Color(0x2286E0C4), height: 1),
+          _buildVerticalDivider(),
+          // Food Eaten
+          _buildTopBarItem(
+            icon: Icons.apple,
+            iconColor: const Color(0xFFE6402F),
+            label: 'FOOD EATEN',
+            value: '${_controller.foodEaten}',
+            valueColor: const Color(0xFFE6402F),
+            monoStyle: monoStyle,
           ),
-          // Current Score Row
-          Row(
-            children: [
-              const SizedBox(width: 30),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'SCORE',
-                    style: monoStyle.copyWith(
-                      color: const Color(0xFF5C8A63),
-                      fontSize: 10,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                  Text(
-                    '${_controller.score}',
-                    style: monoStyle.copyWith(
-                      color: const Color(0xFFD4F7D4),
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+          _buildVerticalDivider(),
+          // Time
+          _buildTopBarItem(
+            icon: Icons.access_time,
+            iconColor: const Color(0xFF00BCD4),
+            label: 'TIME',
+            value: _formatTime(_controller.timeElapsedSec),
+            valueColor: const Color(0xFF00BCD4),
+            monoStyle: monoStyle,
+          ),
+          _buildVerticalDivider(),
+          // Best
+          _buildTopBarItem(
+            icon: Icons.emoji_events,
+            iconColor: const Color(0xFFFFD700),
+            label: 'BEST',
+            value: '${_controller.bestScore}',
+            valueColor: const Color(0xFFFFD700),
+            monoStyle: monoStyle,
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildVerticalDivider() {
+    return Container(height: 20, width: 1, color: const Color(0x1A86E0C4));
+  }
+
+  Widget _buildTopBarItem({
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required String value,
+    required Color valueColor,
+    required TextStyle monoStyle,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: iconColor, size: 16),
+        const SizedBox(width: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: monoStyle.copyWith(
+                color: const Color(0xFF5C8A63),
+                fontSize: 8,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.0,
+              ),
+            ),
+            Text(
+              value,
+              style: monoStyle.copyWith(
+                color: valueColor,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSideCard({
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required String value,
+    required Color valueColor,
+    Widget? trailing,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 3.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF14241B),
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(color: const Color(0x2286E0C4), width: 1.0),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: Color(0xFF5C8A63),
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: valueColor,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ?trailing,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSidePanel(TextStyle monoStyle) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildSideCard(
+          icon: Icons.emoji_events,
+          iconColor: const Color(0xFFFFD700),
+          label: 'BEST SCORE',
+          value: '${_controller.bestScore}',
+          valueColor: const Color(0xFFFFD700),
+        ),
+        _buildSideCard(
+          icon: Icons.bar_chart,
+          iconColor: const Color(0xFF86E0C4),
+          label: 'SCORE',
+          value: '${_controller.score}',
+          valueColor: const Color(0xFF86E0C4),
+        ),
+        _buildSideCard(
+          icon: Icons.apple,
+          iconColor: const Color(0xFFE6402F),
+          label: 'FOOD EATEN',
+          value: '${_controller.foodEaten}',
+          valueColor: const Color(0xFFE6402F),
+        ),
+        _buildSideCard(
+          icon: Icons.speed,
+          iconColor: const Color(0xFF86E0C4),
+          label: 'SPEED',
+          value: _controller.speedMode,
+          valueColor: const Color(0xFF86E0C4),
+          trailing: TextButton(
+            onPressed: () {
+              _controller.cycleSpeedMode();
+              _focusNode.requestFocus();
+            },
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              backgroundColor: const Color(0x1F86E0C4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+                side: const BorderSide(color: Color(0x3386E0C4)),
+              ),
+            ),
+            child: Text(
+              'CHANGE',
+              style: monoStyle.copyWith(
+                color: const Color(0xFF86E0C4),
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        _buildPauseButton(monoStyle),
+        const SizedBox(height: 10),
+        _buildDpad(size: 40.0),
+      ],
     );
   }
 
@@ -181,36 +336,32 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     required double cellSize,
     required bool isLandscape,
   }) {
-    if (isLandscape) {
-      return _buildLandscapeHUD(monoStyle);
-    } else {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-        child: SizedBox(
-          width: min(
-            MediaQuery.of(context).size.width * 0.9,
-            _controller.cols * cellSize + 20,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildHUDItem(
-                'SCORE',
-                '${_controller.score}',
-                monoStyle,
-                CrossAxisAlignment.start,
-              ),
-              _buildHUDItem(
-                'BEST',
-                '${_controller.bestScore}',
-                monoStyle,
-                CrossAxisAlignment.end,
-              ),
-            ],
-          ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+      child: SizedBox(
+        width: min(
+          MediaQuery.of(context).size.width * 0.9,
+          _controller.cols * cellSize + 20,
         ),
-      );
-    }
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildHUDItem(
+              'SCORE',
+              '${_controller.score}',
+              monoStyle,
+              CrossAxisAlignment.start,
+            ),
+            _buildHUDItem(
+              'BEST',
+              '${_controller.bestScore}',
+              monoStyle,
+              CrossAxisAlignment.end,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildHUDItem(
@@ -359,12 +510,10 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
               final double availableWidth;
 
               if (isLandscape) {
-                availableHeight = constraints.maxHeight - 40.0;
+                availableHeight = constraints.maxHeight - 70.0;
                 availableWidth = constraints.maxWidth * 0.7 - 40.0;
               } else {
-                availableHeight =
-                    constraints.maxHeight -
-                    310.0; // Extra room for pause button
+                availableHeight = constraints.maxHeight - 310.0;
                 availableWidth = constraints.maxWidth - 40.0;
               }
 
@@ -418,7 +567,8 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                             ),
                             painter: SnakeBoardPainter(
                               snake: _controller.snake,
-                              apple: _controller.apple,
+                              apples: _controller.apples,
+                              obstacles: _controller.obstacles,
                               dir: _controller.dir,
                               cellSize: cellSize,
                               cols: _controller.cols,
@@ -526,24 +676,36 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
 
               if (isLandscape) {
                 return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Left Column: Game Board
-                    Expanded(flex: 7, child: Center(child: gameBoard)),
-
-                    // Right Column: Side Panel (HUD, Pause, D-pad)
+                    // Left Column: Back Button + (Top Bar + Game Board)
                     Expanded(
-                      flex: 3,
+                      flex: 7,
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildLandscapeHUD(monoStyle),
-                          const SizedBox(height: 16),
-                          _buildPauseButton(monoStyle),
-                          const SizedBox(height: 16),
-                          _buildDpad(size: 44.0),
+                          // Top bar row (Back Button + Stats Bar)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 8.0,
+                            ),
+                            child: Row(
+                              children: [
+                                _buildBackButton(),
+                                const SizedBox(width: 16),
+                                Expanded(child: _buildTopBar(monoStyle)),
+                              ],
+                            ),
+                          ),
+                          // Game Board
+                          Expanded(child: Center(child: gameBoard)),
                         ],
                       ),
                     ),
+
+                    // Right Column: Side Panel
+                    Expanded(flex: 3, child: _buildSidePanel(monoStyle)),
                   ],
                 );
               } else {
@@ -551,6 +713,29 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // Portrait Top Row (Back Button + Title)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24.0,
+                        vertical: 8.0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildBackButton(),
+                          Text(
+                            'NEON SNAKE',
+                            style: monoStyle.copyWith(
+                              color: const Color(0xFF86E0C4),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                          const SizedBox(width: 38), // Balance spacing
+                        ],
+                      ),
+                    ),
                     _buildHUD(
                       monoStyle,
                       cellSize: cellSize,

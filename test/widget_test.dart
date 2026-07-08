@@ -28,7 +28,7 @@ void main() {
     expect(find.text('BEST'), findsOneWidget);
     expect(
       find.text('0'),
-      findsNWidgets(2),
+      findsAtLeastNWidgets(2),
     ); // score is 0, best score is 0 initially
 
     // Verify that start overlay is visible.

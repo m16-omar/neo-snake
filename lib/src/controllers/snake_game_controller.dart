@@ -7,6 +7,7 @@ import '../models/snake_game_model.dart';
 class SnakeGameController extends ChangeNotifier {
   final SnakeGameModel _model = SnakeGameModel();
   Timer? _timer;
+  Timer? _timeTrackerTimer;
 
   static const String _bestScoreKey = 'snakeBestScore';
 
@@ -18,9 +19,13 @@ class SnakeGameController extends ChangeNotifier {
   // Getters to expose model state to View
   List<Point<int>> get snake => _model.snake;
   Point<int> get dir => _model.dir;
-  Point<int> get apple => _model.apple;
+  List<Point<int>> get apples => _model.apples;
+  List<Point<int>> get obstacles => _model.obstacles;
   int get score => _model.score;
   int get bestScore => _model.bestScore;
+  int get foodEaten => _model.foodEaten;
+  int get timeElapsedSec => _model.timeElapsedSec;
+  String get speedMode => _model.speedMode;
   bool get isRunning => _model.isRunning;
   bool get isAlive => _model.isAlive;
   bool get isPaused => _model.isPaused;
@@ -31,6 +36,7 @@ class SnakeGameController extends ChangeNotifier {
   @override
   void dispose() {
     _timer?.cancel();
+    _timeTrackerTimer?.cancel();
     super.dispose();
   }
 
@@ -64,24 +70,76 @@ class SnakeGameController extends ChangeNotifier {
     _model.dir = const Point(1, 0);
     _model.nextDir = const Point(1, 0);
     _model.score = 0;
-    _model.tickMs = 130;
+    _model.foodEaten = 0;
+    _model.timeElapsedSec = 0;
+    _model.tickMs = _model.speedMode == 'Low'
+        ? 180
+        : (_model.speedMode == 'High' ? 80 : 130);
     _model.isAlive = true;
     _model.isRunning = false;
     _model.isPaused = false;
-    placeApple();
+    _model.apples.clear();
+    generateObstacles();
+    placeApples();
     notifyListeners();
   }
 
-  void placeApple() {
+  void generateObstacles() {
+    _model.obstacles.clear();
+    // Vertical wall top center
+    int midX = _model.cols ~/ 2;
+    _model.obstacles.add(Point(midX, 2));
+    _model.obstacles.add(Point(midX, 3));
+
+    // Horizontal wall lower left
+    _model.obstacles.add(Point(2, _model.rows - 5));
+    _model.obstacles.add(Point(3, _model.rows - 5));
+    _model.obstacles.add(Point(4, _model.rows - 5));
+
+    // Square wall mid right
+    _model.obstacles.add(Point(_model.cols - 4, _model.rows ~/ 2));
+    _model.obstacles.add(Point(_model.cols - 3, _model.rows ~/ 2));
+    _model.obstacles.add(Point(_model.cols - 4, _model.rows ~/ 2 + 1));
+    _model.obstacles.add(Point(_model.cols - 3, _model.rows ~/ 2 + 1));
+  }
+
+  void placeApples() {
     final rand = Random();
-    bool valid = false;
-    while (!valid) {
-      _model.apple = Point(
-        rand.nextInt(_model.cols),
-        rand.nextInt(_model.rows),
-      );
-      valid = !_model.snake.any((segment) => segment == _model.apple);
+    while (_model.apples.length < 3) {
+      Point<int> newApple;
+      bool valid = false;
+      int attempts = 0;
+      while (!valid && attempts < 100) {
+        newApple = Point(rand.nextInt(_model.cols), rand.nextInt(_model.rows));
+        valid =
+            !_model.snake.any((segment) => segment == newApple) &&
+            !_model.obstacles.any((obs) => obs == newApple) &&
+            !_model.apples.any((a) => a == newApple);
+        if (valid) {
+          _model.apples.add(newApple);
+        }
+        attempts++;
+      }
     }
+  }
+
+  void cycleSpeedMode() {
+    if (_model.speedMode == 'Low') {
+      _model.speedMode = 'Medium';
+    } else if (_model.speedMode == 'Medium') {
+      _model.speedMode = 'High';
+    } else {
+      _model.speedMode = 'Low';
+    }
+
+    _model.tickMs = _model.speedMode == 'Low'
+        ? 180
+        : (_model.speedMode == 'High' ? 80 : 130);
+
+    if (_model.isRunning && !_model.isPaused && _model.isAlive) {
+      _startTimer();
+    }
+    notifyListeners();
   }
 
   void updateOrientation(bool isLandscape) {
@@ -102,6 +160,7 @@ class SnakeGameController extends ChangeNotifier {
     } else {
       _model.isPaused = true;
       _timer?.cancel();
+      _timeTrackerTimer?.cancel();
     }
     notifyListeners();
   }
@@ -119,6 +178,14 @@ class SnakeGameController extends ChangeNotifier {
       Duration(milliseconds: _model.tickMs),
       (t) => _loop(),
     );
+
+    _timeTrackerTimer?.cancel();
+    _timeTrackerTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (_model.isRunning && !_model.isPaused && _model.isAlive) {
+        _model.timeElapsedSec++;
+        notifyListeners();
+      }
+    });
   }
 
   void _loop() {
@@ -142,6 +209,12 @@ class SnakeGameController extends ChangeNotifier {
       return;
     }
 
+    // Obstacle collision
+    if (_model.obstacles.any((obs) => obs == newHead)) {
+      _gameOver();
+      return;
+    }
+
     // Self collision
     if (_model.snake.any((segment) => segment == newHead)) {
       _gameOver();
@@ -151,11 +224,16 @@ class SnakeGameController extends ChangeNotifier {
     _model.snake.insert(0, newHead);
 
     // Eating apple
-    if (newHead == _model.apple) {
+    if (_model.apples.contains(newHead)) {
       _model.score += 10;
-      placeApple();
-      // Speed up
-      _model.tickMs = max(70, _model.tickMs - 2);
+      _model.foodEaten += 1;
+      _model.apples.remove(newHead);
+      placeApples();
+      // Dynamic speed up based on speedMode
+      _model.tickMs = max(
+        _model.speedMode == 'High' ? 50 : 70,
+        _model.tickMs - 2,
+      );
       _startTimer(); // Restart timer with new tick rate
     } else {
       _model.snake.removeLast();
@@ -167,6 +245,7 @@ class SnakeGameController extends ChangeNotifier {
     _model.isRunning = false;
     _model.isPaused = false;
     _timer?.cancel();
+    _timeTrackerTimer?.cancel();
     if (_model.score > _model.bestScore) {
       _model.bestScore = _model.score;
       _saveBestScore();
