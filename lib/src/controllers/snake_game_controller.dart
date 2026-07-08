@@ -181,34 +181,31 @@ class SnakeGameController extends ChangeNotifier {
     final head = _model.snake.first;
     final newHead = Point(head.x + _model.dir.x, head.y + _model.dir.y);
 
-    // Wall collision
-    if (newHead.x < 0 ||
-        newHead.x >= _model.cols ||
-        newHead.y < 0 ||
-        newHead.y >= _model.rows) {
-      _gameOver();
-      return;
-    }
+    // Wall wrap-around: snake exits one side and enters from the opposite side
+    final wrappedHead = Point(
+      (newHead.x + _model.cols) % _model.cols,
+      (newHead.y + _model.rows) % _model.rows,
+    );
 
     // Obstacle collision
-    if (_model.obstacles.any((obs) => obs == newHead)) {
+    if (_model.obstacles.any((obs) => obs == wrappedHead)) {
       _gameOver();
       return;
     }
 
     // Self collision
-    if (_model.snake.any((segment) => segment == newHead)) {
+    if (_model.snake.any((segment) => segment == wrappedHead)) {
       _gameOver();
       return;
     }
 
-    _model.snake.insert(0, newHead);
+    _model.snake.insert(0, wrappedHead);
 
     // Eating apple
-    if (_model.apples.contains(newHead)) {
+    if (_model.apples.contains(wrappedHead)) {
       _model.score += 10;
       _model.foodEaten += 1;
-      _model.apples.remove(newHead);
+      _model.apples.remove(wrappedHead);
       placeApples();
 
       // Progressive speed curve calculation:
