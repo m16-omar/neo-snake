@@ -494,17 +494,6 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     );
   }
 
-  Widget _buildHint(TextStyle monoStyle) {
-    return Text(
-      'arrow keys / WASD also work',
-      textAlign: TextAlign.center,
-      style: monoStyle.copyWith(
-        color: const Color(0xFF4D7256),
-        fontSize: 11,
-        letterSpacing: 1,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -533,7 +522,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                 availableHeight = constraints.maxHeight - 70.0;
                 availableWidth = constraints.maxWidth * 0.7 - 40.0;
               } else {
-                availableHeight = constraints.maxHeight - 310.0;
+                availableHeight = constraints.maxHeight - 400.0;
                 availableWidth = constraints.maxWidth - 40.0;
               }
 
@@ -761,14 +750,12 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                       cellSize: cellSize,
                       isLandscape: false,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     gameBoard,
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     _buildPauseButton(monoStyle),
-                    const SizedBox(height: 12),
-                    _buildDpad(size: 40.0),
-                    const SizedBox(height: 10),
-                    _buildHint(monoStyle),
+                    const SizedBox(height: 8),
+                    _buildDpad(size: 36.0),
                   ],
                 );
               }
