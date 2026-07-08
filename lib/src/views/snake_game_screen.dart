@@ -275,46 +275,59 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
   }
 
   Widget _buildSidePanel(TextStyle monoStyle) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildSideCard(
-          icon: Icons.emoji_events,
-          iconColor: const Color(0xFFFFD700),
-          label: 'BEST SCORE',
-          value: '${_controller.bestScore}',
-          valueColor: const Color(0xFFFFD700),
-          compact: true,
-        ),
-        _buildSideCard(
-          icon: Icons.bar_chart,
-          iconColor: const Color(0xFF86E0C4),
-          label: 'SCORE',
-          value: '${_controller.score}',
-          valueColor: const Color(0xFF86E0C4),
-          compact: true,
-        ),
-        _buildSideCard(
-          icon: Icons.apple,
-          iconColor: const Color(0xFFE6402F),
-          label: 'FOOD EATEN',
-          value: '${_controller.foodEaten}',
-          valueColor: const Color(0xFFE6402F),
-          compact: true,
-        ),
-        _buildSideCard(
-          icon: Icons.star,
-          iconColor: const Color(0xFFFFD700),
-          label: 'LEVEL',
-          value: 'Level ${_controller.level}',
-          valueColor: const Color(0xFF86E0C4),
-          compact: true,
-        ),
-        const SizedBox(height: 4),
-        _buildPauseButton(monoStyle, compact: true),
-        const SizedBox(height: 4),
-        _buildDpad(size: 30.0),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Fixed UI above the D-pad: 4 cards + pause button + spacers
+        // Estimate ~28px per compact card × 4 = 112, pause ~36, spacers ~8
+        const double fixedHeight = 160.0;
+        final double remainingHeight =
+            (constraints.maxHeight - fixedHeight).clamp(60.0, 200.0);
+        // D-pad circle = remainingHeight, but cap button size sensibly
+        final double dpadSize = (remainingHeight / 3.4).clamp(26.0, 68.0);
+
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildSideCard(
+              icon: Icons.emoji_events,
+              iconColor: const Color(0xFFFFD700),
+              label: 'BEST SCORE',
+              value: '${_controller.bestScore}',
+              valueColor: const Color(0xFFFFD700),
+              compact: true,
+            ),
+            _buildSideCard(
+              icon: Icons.bar_chart,
+              iconColor: const Color(0xFF86E0C4),
+              label: 'SCORE',
+              value: '${_controller.score}',
+              valueColor: const Color(0xFF86E0C4),
+              compact: true,
+            ),
+            _buildSideCard(
+              icon: Icons.apple,
+              iconColor: const Color(0xFFE6402F),
+              label: 'FOOD EATEN',
+              value: '${_controller.foodEaten}',
+              valueColor: const Color(0xFFE6402F),
+              compact: true,
+            ),
+            _buildSideCard(
+              icon: Icons.star,
+              iconColor: const Color(0xFFFFD700),
+              label: 'LEVEL',
+              value: 'Level ${_controller.level}',
+              valueColor: const Color(0xFF86E0C4),
+              compact: true,
+            ),
+            const SizedBox(height: 6),
+            _buildPauseButton(monoStyle, compact: true),
+            const SizedBox(height: 6),
+            // D-pad grows to fill remaining space
+            _buildDpad(size: dpadSize),
+          ],
+        );
+      },
     );
   }
 
