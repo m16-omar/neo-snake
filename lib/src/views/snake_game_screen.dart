@@ -494,7 +494,6 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     const monoStyle = TextStyle(
@@ -753,7 +752,12 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                     const SizedBox(height: 8),
                     gameBoard,
                     const SizedBox(height: 8),
-                    _buildPauseButton(monoStyle),
+                    Center(
+                      child: SizedBox(
+                        width: 180,
+                        child: _buildPauseButton(monoStyle, compact: true),
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     _buildDpad(size: 52.0),
                   ],
