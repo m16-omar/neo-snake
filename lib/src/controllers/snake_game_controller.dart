@@ -23,6 +23,7 @@ class SnakeGameController extends ChangeNotifier {
   int get bestScore => _model.bestScore;
   bool get isRunning => _model.isRunning;
   bool get isAlive => _model.isAlive;
+  bool get isPaused => _model.isPaused;
   int get tickMs => _model.tickMs;
   int get cols => _model.cols;
   int get rows => _model.rows;
@@ -66,6 +67,7 @@ class SnakeGameController extends ChangeNotifier {
     _model.tickMs = 130;
     _model.isAlive = true;
     _model.isRunning = false;
+    _model.isPaused = false;
     placeApple();
     notifyListeners();
   }
@@ -92,6 +94,18 @@ class SnakeGameController extends ChangeNotifier {
     }
   }
 
+  void togglePause() {
+    if (!_model.isAlive || !_model.isRunning) return;
+    if (_model.isPaused) {
+      _model.isPaused = false;
+      _startTimer();
+    } else {
+      _model.isPaused = true;
+      _timer?.cancel();
+    }
+    notifyListeners();
+  }
+
   void startGame() {
     reset();
     _model.isRunning = true;
@@ -113,7 +127,7 @@ class SnakeGameController extends ChangeNotifier {
   }
 
   void step() {
-    if (!_model.isAlive) return;
+    if (!_model.isAlive || _model.isPaused) return;
 
     _model.dir = _model.nextDir;
     final head = _model.snake.first;
@@ -151,6 +165,7 @@ class SnakeGameController extends ChangeNotifier {
   void _gameOver() {
     _model.isAlive = false;
     _model.isRunning = false;
+    _model.isPaused = false;
     _timer?.cancel();
     if (_model.score > _model.bestScore) {
       _model.bestScore = _model.score;
@@ -159,7 +174,7 @@ class SnakeGameController extends ChangeNotifier {
   }
 
   void setDir(int x, int y) {
-    if (!_model.isAlive || !_model.isRunning) return;
+    if (!_model.isAlive || !_model.isRunning || _model.isPaused) return;
     // Prevent 180 degree turns
     if (_model.dir.x == -x && _model.dir.y == -y) return;
     if (_model.dir.x == x && _model.dir.y == y) return;

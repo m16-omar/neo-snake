@@ -13,5 +13,6 @@ class SnakeGameModel {
   int bestScore = 0;
   bool isRunning = false;
   bool isAlive = false;
+  bool isPaused = false;
   int tickMs = 130;
 }

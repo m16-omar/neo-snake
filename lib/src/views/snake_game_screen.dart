@@ -94,31 +94,95 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     _dragStart = null;
   }
 
+  Widget _buildLandscapeHUD(TextStyle monoStyle) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF14241B),
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: const Color(0x3386E0C4), width: 1.5),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Best Score Row
+          Row(
+            children: [
+              const Icon(
+                Icons.emoji_events,
+                color: Color(0xFFFFD700), // Gold Trophy
+                size: 22,
+              ),
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'BEST',
+                    style: monoStyle.copyWith(
+                      color: const Color(0xFF5C8A63),
+                      fontSize: 10,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  Text(
+                    '${_controller.bestScore}',
+                    style: monoStyle.copyWith(
+                      color: const Color(0xFFFFD700),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Divider(color: Color(0x2286E0C4), height: 1),
+          ),
+          // Current Score Row
+          Row(
+            children: [
+              const SizedBox(width: 30),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'SCORE',
+                    style: monoStyle.copyWith(
+                      color: const Color(0xFF5C8A63),
+                      fontSize: 10,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  Text(
+                    '${_controller.score}',
+                    style: monoStyle.copyWith(
+                      color: const Color(0xFFD4F7D4),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHUD(
     TextStyle monoStyle, {
     required double cellSize,
     required bool isLandscape,
   }) {
     if (isLandscape) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHUDItem(
-            'SCORE',
-            '${_controller.score}',
-            monoStyle,
-            CrossAxisAlignment.center,
-          ),
-          const SizedBox(height: 20),
-          _buildHUDItem(
-            'BEST',
-            '${_controller.bestScore}',
-            monoStyle,
-            CrossAxisAlignment.center,
-          ),
-        ],
-      );
+      return _buildLandscapeHUD(monoStyle);
     } else {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
@@ -177,6 +241,42 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPauseButton(TextStyle monoStyle) {
+    final isPaused = _controller.isPaused;
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: OutlinedButton.icon(
+        onPressed: () {
+          _controller.togglePause();
+          _focusNode.requestFocus();
+        },
+        style: OutlinedButton.styleFrom(
+          backgroundColor: const Color(0xFF14241B),
+          side: const BorderSide(color: Color(0x3386E0C4), width: 1.5),
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+        icon: Icon(
+          isPaused ? Icons.play_arrow : Icons.pause,
+          color: const Color(0xFF86E0C4),
+          size: 16,
+        ),
+        label: Text(
+          isPaused ? 'RESUME' : 'PAUSE',
+          style: monoStyle.copyWith(
+            color: const Color(0xFF86E0C4),
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2,
+          ),
+        ),
+      ),
     );
   }
 
@@ -260,9 +360,11 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
 
               if (isLandscape) {
                 availableHeight = constraints.maxHeight - 40.0;
-                availableWidth = constraints.maxWidth * 0.6 - 40.0;
+                availableWidth = constraints.maxWidth * 0.7 - 40.0;
               } else {
-                availableHeight = constraints.maxHeight - 260.0;
+                availableHeight =
+                    constraints.maxHeight -
+                    310.0; // Extra room for pause button
                 availableWidth = constraints.maxWidth - 40.0;
               }
 
@@ -326,8 +428,8 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                         ),
                       ),
 
-                      // Ready / Game Over Overlays
-                      if (!_controller.isRunning)
+                      // Ready / Game Over / Paused Overlays
+                      if (!_controller.isRunning || _controller.isPaused)
                         Positioned.fill(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12.0),
@@ -337,17 +439,23 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    _controller.isAlive
-                                        ? 'READY?'
-                                        : 'GAME OVER',
+                                    _controller.isPaused
+                                        ? 'PAUSED'
+                                        : (_controller.isAlive
+                                              ? 'READY?'
+                                              : 'GAME OVER'),
                                     style: monoStyle.copyWith(
-                                      color: const Color(0xFFFF8A6B),
+                                      color: _controller.isPaused
+                                          ? const Color(0xFF86E0C4)
+                                          : const Color(0xFFFF8A6B),
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 3,
-                                      shadows: const [
+                                      shadows: [
                                         Shadow(
-                                          color: Color(0x80FF785A),
+                                          color: _controller.isPaused
+                                              ? const Color(0x8086E0C4)
+                                              : const Color(0x80FF785A),
                                           blurRadius: 10,
                                         ),
                                       ],
@@ -359,9 +467,11 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                                       horizontal: 16.0,
                                     ),
                                     child: Text(
-                                      _controller.isAlive
-                                          ? 'Use arrow keys, swipe, or the pad below'
-                                          : 'Score: ${_controller.score}${_controller.score >= _controller.bestScore && _controller.score > 0 ? '  •  new best!' : ''}',
+                                      _controller.isPaused
+                                          ? 'Tap resume or the button to continue'
+                                          : (_controller.isAlive
+                                                ? 'Use arrow keys, swipe, or the pad below'
+                                                : 'Score: ${_controller.score}${_controller.score >= _controller.bestScore && _controller.score > 0 ? '  •  new best!' : ''}'),
                                       textAlign: TextAlign.center,
                                       style: monoStyle.copyWith(
                                         color: const Color(0xFF8FC99A),
@@ -372,7 +482,11 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                                   const SizedBox(height: 18),
                                   ElevatedButton(
                                     onPressed: () {
-                                      _controller.startGame();
+                                      if (_controller.isPaused) {
+                                        _controller.togglePause();
+                                      } else {
+                                        _controller.startGame();
+                                      }
                                       _focusNode.requestFocus();
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -388,9 +502,11 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                                       ),
                                     ),
                                     child: Text(
-                                      _controller.isAlive
-                                          ? 'PLAY'
-                                          : 'PLAY AGAIN',
+                                      _controller.isPaused
+                                          ? 'RESUME'
+                                          : (_controller.isAlive
+                                                ? 'PLAY'
+                                                : 'PLAY AGAIN'),
                                       style: monoStyle.copyWith(
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
@@ -411,27 +527,23 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
               if (isLandscape) {
                 return Row(
                   children: [
-                    // Left Column: HUD, D-pad & Hint
+                    // Left Column: Game Board
+                    Expanded(flex: 7, child: Center(child: gameBoard)),
+
+                    // Right Column: Side Panel (HUD, Pause, D-pad)
                     Expanded(
-                      flex: 4,
+                      flex: 3,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _buildHUD(
-                            monoStyle,
-                            cellSize: cellSize,
-                            isLandscape: true,
-                          ),
+                          _buildLandscapeHUD(monoStyle),
                           const SizedBox(height: 16),
-                          _buildDpad(size: 48.0),
+                          _buildPauseButton(monoStyle),
                           const SizedBox(height: 16),
-                          _buildHint(monoStyle),
+                          _buildDpad(size: 44.0),
                         ],
                       ),
                     ),
-
-                    // Right Column: Game Board
-                    Expanded(flex: 6, child: Center(child: gameBoard)),
                   ],
                 );
               } else {
@@ -444,11 +556,13 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                       cellSize: cellSize,
                       isLandscape: false,
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
                     gameBoard,
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 12),
+                    _buildPauseButton(monoStyle),
+                    const SizedBox(height: 12),
                     _buildDpad(),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 10),
                     _buildHint(monoStyle),
                   ],
                 );
