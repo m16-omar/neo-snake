@@ -302,7 +302,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
         const SizedBox(height: 6),
         _buildPauseButton(monoStyle),
         const SizedBox(height: 6),
-        _buildDpad(size: 38.0),
+        _buildDpad(size: 50.0),
       ],
     );
   }

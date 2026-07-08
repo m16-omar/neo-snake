@@ -72,7 +72,7 @@ class SnakeGameController extends ChangeNotifier {
     _model.score = 0;
     _model.foodEaten = 0;
     _model.timeElapsedSec = 0;
-    _model.tickMs = 180; // Starting speed for Level 1
+    _model.tickMs = 220; // Starting speed for Level 1 (slower/easier)
     _model.isAlive = true;
     _model.isRunning = false;
     _model.isPaused = false;
@@ -213,10 +213,10 @@ class SnakeGameController extends ChangeNotifier {
 
       // Progressive speed curve calculation:
       // Level = min(30, (foodEaten ~/ 5) + 1)
-      // Level 1: 180ms
-      // Level 30: 50ms
+      // Level 1: 220ms (slow, easy startup)
+      // Level 30: 60ms (fast, challenging peak)
       final currentLevel = min(30, (_model.foodEaten ~/ 5) + 1);
-      _model.tickMs = 180 - ((currentLevel - 1) * 4.5).round();
+      _model.tickMs = 220 - ((currentLevel - 1) * 5.5).round();
 
       _startTimer(); // Restart loop with the new tickMs immediately
     } else {
