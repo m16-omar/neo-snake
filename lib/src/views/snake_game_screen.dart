@@ -225,8 +225,8 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     Widget? trailing,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 3.0),
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
       decoration: BoxDecoration(
         color: const Color(0xFF14241B),
         borderRadius: BorderRadius.circular(10.0),
@@ -323,10 +323,10 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 6),
         _buildPauseButton(monoStyle),
-        const SizedBox(height: 10),
-        _buildDpad(size: 40.0),
+        const SizedBox(height: 6),
+        _buildDpad(size: 38.0),
       ],
     );
   }
