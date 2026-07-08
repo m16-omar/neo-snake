@@ -458,16 +458,17 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                 availableHeight = constraints.maxHeight - 70.0;
                 availableWidth = constraints.maxWidth * 0.7 - 40.0;
               } else {
-                availableHeight = constraints.maxHeight - 390.0;
-                availableWidth = constraints.maxWidth - 72.0; // 40 base + 2×16 board margin
+                availableHeight = constraints.maxHeight - 290.0;
+                availableWidth = constraints.maxWidth - 56.0; // 40 base + 2×8 board margin
               }
 
               final widthCellSize = availableWidth / _controller.cols;
               final heightCellSize = availableHeight / _controller.rows;
+              final double maxCell = isLandscape ? 26.0 : 30.0;
               final cellSize = min(
-                26.0,
+                maxCell,
                 min(widthCellSize, heightCellSize),
-              ).clamp(12.0, 26.0);
+              ).clamp(12.0, maxCell);
 
               final gameBoard = Center(
                 child: Container(
@@ -658,45 +659,18 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    // ── Row 1: Back button + title ────────────────────────
+                    // ── Ultra-compact single-row header ────────────────────
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
+                        horizontal: 12.0,
                         vertical: 4.0,
                       ),
                       child: Row(
                         children: [
+                          // Back button
                           _buildBackButton(),
-                          Expanded(
-                            child: Text(
-                              'NEON SNAKE',
-                              textAlign: TextAlign.center,
-                              style: monoStyle.copyWith(
-                                color: const Color(0xFF86E0C4),
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 2,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 38), // balance back button
-                        ],
-                      ),
-                    ),
-                    // ── Row 2: Stats bar (LENGTH · FOOD · TIME · BEST) ────
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: _buildTopBar(monoStyle),
-                    ),
-                    // ── Row 3: SCORE + LEVEL secondary bar ────────────────
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 4.0,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
+                          const SizedBox(width: 6),
+                          // Score
                           _buildTopBarItem(
                             icon: Icons.bar_chart,
                             iconColor: const Color(0xFF86E0C4),
@@ -705,11 +679,36 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                             valueColor: const Color(0xFF86E0C4),
                             monoStyle: monoStyle,
                           ),
+                          _buildVerticalDivider(),
+                          const SizedBox(width: 6),
+                          // Food eaten
+                          _buildTopBarItem(
+                            icon: Icons.apple,
+                            iconColor: const Color(0xFFE6402F),
+                            label: 'FOOD',
+                            value: '${_controller.foodEaten}',
+                            valueColor: const Color(0xFFE6402F),
+                            monoStyle: monoStyle,
+                          ),
+                          _buildVerticalDivider(),
+                          const SizedBox(width: 6),
+                          // Level
                           _buildTopBarItem(
                             icon: Icons.star,
                             iconColor: const Color(0xFFFFD700),
-                            label: 'LEVEL',
-                            value: 'Level ${_controller.level}',
+                            label: 'LVL',
+                            value: '${_controller.level}',
+                            valueColor: const Color(0xFFFFD700),
+                            monoStyle: monoStyle,
+                          ),
+                          _buildVerticalDivider(),
+                          const SizedBox(width: 6),
+                          // Best
+                          _buildTopBarItem(
+                            icon: Icons.emoji_events,
+                            iconColor: const Color(0xFFFFD700),
+                            label: 'BEST',
+                            value: '${_controller.bestScore}',
                             valueColor: const Color(0xFFFFD700),
                             monoStyle: monoStyle,
                           ),
@@ -718,20 +717,20 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                     ),
                     // ── Game board ─────────────────────────────────────────
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: gameBoard,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     // ── Pause button ─────────────────────────────────────
                     Center(
                       child: SizedBox(
-                        width: 180,
+                        width: 160,
                         child: _buildPauseButton(monoStyle, compact: true),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     // ── D-pad ────────────────────────────────────────────
-                    _buildDpad(size: 52.0),
+                    _buildDpad(size: 46.0),
                   ],
                 );
               }
