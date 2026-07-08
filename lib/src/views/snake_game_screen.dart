@@ -459,7 +459,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                 availableWidth = constraints.maxWidth * 0.7 - 40.0;
               } else {
                 availableHeight = constraints.maxHeight - 390.0;
-                availableWidth = constraints.maxWidth - 40.0;
+                availableWidth = constraints.maxWidth - 72.0; // 40 base + 2×16 board margin
               }
 
               final widthCellSize = availableWidth / _controller.cols;
@@ -716,8 +716,11 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                         ],
                       ),
                     ),
-                    // ── Game board ───────────────────────────────────────
-                    gameBoard,
+                    // ── Game board ─────────────────────────────────────────
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: gameBoard,
+                    ),
                     const SizedBox(height: 8),
                     // ── Pause button ─────────────────────────────────────
                     Center(
