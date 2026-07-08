@@ -25,7 +25,7 @@ class SnakeGameController extends ChangeNotifier {
   int get bestScore => _model.bestScore;
   int get foodEaten => _model.foodEaten;
   int get timeElapsedSec => _model.timeElapsedSec;
-  String get speedMode => _model.speedMode;
+  int get level => min(30, (_model.foodEaten ~/ 5) + 1);
   bool get isRunning => _model.isRunning;
   bool get isAlive => _model.isAlive;
   bool get isPaused => _model.isPaused;
@@ -72,9 +72,7 @@ class SnakeGameController extends ChangeNotifier {
     _model.score = 0;
     _model.foodEaten = 0;
     _model.timeElapsedSec = 0;
-    _model.tickMs = _model.speedMode == 'Low'
-        ? 180
-        : (_model.speedMode == 'High' ? 80 : 130);
+    _model.tickMs = 180; // Starting speed for Level 1
     _model.isAlive = true;
     _model.isRunning = false;
     _model.isPaused = false;
@@ -110,9 +108,11 @@ class SnakeGameController extends ChangeNotifier {
       bool valid = false;
       int attempts = 0;
       while (!valid && attempts < 100) {
-        newApple = Point(rand.nextInt(_model.cols), rand.nextInt(_model.rows));
-        valid =
-            !_model.snake.any((segment) => segment == newApple) &&
+        newApple = Point(
+          rand.nextInt(_model.cols),
+          rand.nextInt(_model.rows),
+        );
+        valid = !_model.snake.any((segment) => segment == newApple) &&
             !_model.obstacles.any((obs) => obs == newApple) &&
             !_model.apples.any((a) => a == newApple);
         if (valid) {
@@ -121,25 +121,6 @@ class SnakeGameController extends ChangeNotifier {
         attempts++;
       }
     }
-  }
-
-  void cycleSpeedMode() {
-    if (_model.speedMode == 'Low') {
-      _model.speedMode = 'Medium';
-    } else if (_model.speedMode == 'Medium') {
-      _model.speedMode = 'High';
-    } else {
-      _model.speedMode = 'Low';
-    }
-
-    _model.tickMs = _model.speedMode == 'Low'
-        ? 180
-        : (_model.speedMode == 'High' ? 80 : 130);
-
-    if (_model.isRunning && !_model.isPaused && _model.isAlive) {
-      _startTimer();
-    }
-    notifyListeners();
   }
 
   void updateOrientation(bool isLandscape) {
@@ -229,12 +210,15 @@ class SnakeGameController extends ChangeNotifier {
       _model.foodEaten += 1;
       _model.apples.remove(newHead);
       placeApples();
-      // Dynamic speed up based on speedMode
-      _model.tickMs = max(
-        _model.speedMode == 'High' ? 50 : 70,
-        _model.tickMs - 2,
-      );
-      _startTimer(); // Restart timer with new tick rate
+
+      // Progressive speed curve calculation:
+      // Level = min(30, (foodEaten ~/ 5) + 1)
+      // Level 1: 180ms
+      // Level 30: 50ms
+      final currentLevel = min(30, (_model.foodEaten ~/ 5) + 1);
+      _model.tickMs = 180 - ((currentLevel - 1) * 4.5).round();
+
+      _startTimer(); // Restart loop with the new tickMs immediately
     } else {
       _model.snake.removeLast();
     }

@@ -293,35 +293,11 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
           valueColor: const Color(0xFFE6402F),
         ),
         _buildSideCard(
-          icon: Icons.speed,
-          iconColor: const Color(0xFF86E0C4),
-          label: 'SPEED',
-          value: _controller.speedMode,
+          icon: Icons.star,
+          iconColor: const Color(0xFFFFD700),
+          label: 'LEVEL',
+          value: 'Level ${_controller.level}',
           valueColor: const Color(0xFF86E0C4),
-          trailing: TextButton(
-            onPressed: () {
-              _controller.cycleSpeedMode();
-              _focusNode.requestFocus();
-            },
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              backgroundColor: const Color(0x1F86E0C4),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-                side: const BorderSide(color: Color(0x3386E0C4)),
-              ),
-            ),
-            child: Text(
-              'CHANGE',
-              style: monoStyle.copyWith(
-                color: const Color(0xFF86E0C4),
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
         ),
         const SizedBox(height: 6),
         _buildPauseButton(monoStyle),

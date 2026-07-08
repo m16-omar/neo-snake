@@ -14,9 +14,8 @@ class SnakeGameModel {
   int bestScore = 0;
   int foodEaten = 0;
   int timeElapsedSec = 0;
-  String speedMode = 'Medium';
   bool isRunning = false;
   bool isAlive = false;
   bool isPaused = false;
-  int tickMs = 130;
+  int tickMs = 180;
 }
