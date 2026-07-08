@@ -522,7 +522,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                 availableHeight = constraints.maxHeight - 70.0;
                 availableWidth = constraints.maxWidth * 0.7 - 40.0;
               } else {
-                availableHeight = constraints.maxHeight - 400.0;
+                availableHeight = constraints.maxHeight - 460.0;
                 availableWidth = constraints.maxWidth - 40.0;
               }
 
@@ -755,7 +755,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                     const SizedBox(height: 8),
                     _buildPauseButton(monoStyle),
                     const SizedBox(height: 8),
-                    _buildDpad(size: 36.0),
+                    _buildDpad(size: 52.0),
                   ],
                 );
               }
