@@ -34,7 +34,7 @@ class _DpadButtonState extends State<DpadButton> {
         height: widget.size,
         decoration: BoxDecoration(
           color: _isPressed ? const Color(0xFF2A5238) : const Color(0xFF173324),
-          borderRadius: BorderRadius.circular(10),
+          shape: BoxShape.circle,
           border: Border.all(color: const Color(0xFF3F6B4D), width: 1.5),
         ),
         alignment: Alignment.center,
