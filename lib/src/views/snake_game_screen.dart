@@ -302,7 +302,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
         const SizedBox(height: 6),
         _buildPauseButton(monoStyle),
         const SizedBox(height: 6),
-        _buildDpad(size: 50.0),
+        _buildDpad(size: 38.0),
       ],
     );
   }
@@ -407,46 +407,79 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     );
   }
 
-  Widget _buildDpad({double size = 52.0}) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(width: size),
-            DpadButton(
+  Widget _buildDpad({double size = 38.0}) {
+    final double padSize = size * 3.4;
+    final double centerOffset = (padSize - size) / 2;
+    return Container(
+      width: padSize,
+      height: padSize,
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F261B),
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0x3386E0C4), width: 2.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Up
+          Positioned(
+            top: 2,
+            left: centerOffset,
+            child: DpadButton(
               size: size,
               label: '▲',
               onTap: () => _controller.setDir(0, -1),
             ),
-            SizedBox(width: size),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            DpadButton(
+          ),
+          // Left
+          Positioned(
+            left: 2,
+            top: centerOffset,
+            child: DpadButton(
               size: size,
               label: '◀',
               onTap: () => _controller.setDir(-1, 0),
             ),
-            const SizedBox(width: 6),
-            DpadButton(
+          ),
+          // Down
+          Positioned(
+            bottom: 2,
+            left: centerOffset,
+            child: DpadButton(
               size: size,
               label: '▼',
               onTap: () => _controller.setDir(0, 1),
             ),
-            const SizedBox(width: 6),
-            DpadButton(
+          ),
+          // Right
+          Positioned(
+            right: 2,
+            top: centerOffset,
+            child: DpadButton(
               size: size,
               label: '▶',
               onTap: () => _controller.setDir(1, 0),
             ),
-          ],
-        ),
-      ],
+          ),
+          // Center cap decoration
+          Center(
+            child: Container(
+              width: size * 0.5,
+              height: size * 0.5,
+              decoration: const BoxDecoration(
+                color: Color(0xFF0D1912),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -722,7 +755,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                     const SizedBox(height: 12),
                     _buildPauseButton(monoStyle),
                     const SizedBox(height: 12),
-                    _buildDpad(),
+                    _buildDpad(size: 40.0),
                     const SizedBox(height: 10),
                     _buildHint(monoStyle),
                   ],
