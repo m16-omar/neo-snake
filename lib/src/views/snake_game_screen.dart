@@ -469,7 +469,8 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
 
               if (isLandscape) {
                 availableHeight = constraints.maxHeight - 70.0;
-                availableWidth = constraints.maxWidth * 0.7 - 40.0;
+                // Use ~72% of total width (left flex=7 of 10) minus small padding
+                availableWidth = constraints.maxWidth * 0.72 - 24.0;
               } else {
                 availableHeight = constraints.maxHeight - 290.0;
                 availableWidth = constraints.maxWidth - 56.0; // 40 base + 2×8 board margin
@@ -620,6 +621,100 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 1,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      // ── Level-Complete Popup ─────────────────────────────
+                      if (_controller.isLevelComplete)
+                        Positioned.fill(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12.0),
+                            child: Container(
+                              color: const Color(0xE0071810),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    '🏆',
+                                    style: TextStyle(fontSize: 42),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'LEVEL COMPLETE!',
+                                    style: monoStyle.copyWith(
+                                      color: const Color(0xFFFFD700),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 3,
+                                      shadows: const [
+                                        Shadow(
+                                          color: Color(0x80FFD700),
+                                          blurRadius: 12,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    'You ate 20 apples! 🍎×20',
+                                    style: monoStyle.copyWith(
+                                      color: const Color(0xFF8FC99A),
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF14241B),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: const Color(0xFF86E0C4),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Level ${_controller.level}  →  Level ${_controller.level + 1}',
+                                      style: monoStyle.copyWith(
+                                        color: const Color(0xFF86E0C4),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 18),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      _controller.advanceLevel();
+                                      _focusNode.requestFocus();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFFFFD700),
+                                      foregroundColor: const Color(0xFF0D1912),
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 28,
+                                        vertical: 12,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(22),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'NEXT LEVEL →',
+                                      style: monoStyle.copyWith(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.5,
                                       ),
                                     ),
                                   ),

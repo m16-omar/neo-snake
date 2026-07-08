@@ -11,12 +11,15 @@ class SnakeGameController extends ChangeNotifier {
 
   static const String _bestScoreKey = 'snakeBestScore';
 
+  /// Number of apples that must be eaten to complete a level.
+  static const int applesPerLevel = 20;
+
   SnakeGameController() {
     _loadBestScore();
     reset();
   }
 
-  // Getters to expose model state to View
+  // ── Getters ─────────────────────────────────────────────────────────────────
   List<Point<int>> get snake => _model.snake;
   Point<int> get dir => _model.dir;
   List<Point<int>> get apples => _model.apples;
@@ -24,15 +27,18 @@ class SnakeGameController extends ChangeNotifier {
   int get score => _model.score;
   int get bestScore => _model.bestScore;
   int get foodEaten => _model.foodEaten;
+  int get foodEatenThisLevel => _model.foodEatenThisLevel;
   int get timeElapsedSec => _model.timeElapsedSec;
-  int get level => min(30, (_model.foodEaten ~/ 5) + 1);
+  int get level => _model.currentLevel;
   bool get isRunning => _model.isRunning;
   bool get isAlive => _model.isAlive;
   bool get isPaused => _model.isPaused;
+  bool get isLevelComplete => _model.isLevelComplete;
   int get tickMs => _model.tickMs;
   int get cols => _model.cols;
   int get rows => _model.rows;
 
+  // ── Persistence ─────────────────────────────────────────────────────────────
   @override
   void dispose() {
     _timer?.cancel();
@@ -46,7 +52,7 @@ class SnakeGameController extends ChangeNotifier {
       _model.bestScore = prefs.getInt(_bestScoreKey) ?? 0;
       notifyListeners();
     } catch (e) {
-      debugPrint('Error loading best score: $e');
+      debugPrint('Error loading best score: \$e');
     }
   }
 
@@ -55,10 +61,21 @@ class SnakeGameController extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_bestScoreKey, _model.bestScore);
     } catch (e) {
-      debugPrint('Error saving best score: $e');
+      debugPrint('Error saving best score: \$e');
     }
   }
 
+  // ── Speed curve ─────────────────────────────────────────────────────────────
+  // Level 1 → 600 ms (very slow, newcomer-friendly)
+  // Level 5 → ~528 ms (still comfortable)
+  // Level 10 → ~438 ms
+  // Level 20 → ~258 ms (challenging)
+  // Level 30 → 80 ms (expert)
+  int _tickMsForLevel(int lvl) {
+    return max(80, 600 - (lvl - 1) * 18);
+  }
+
+  // ── Game lifecycle ───────────────────────────────────────────────────────────
   void reset() {
     final startX = _model.cols ~/ 2;
     final startY = _model.rows ~/ 2;
@@ -71,8 +88,11 @@ class SnakeGameController extends ChangeNotifier {
     _model.nextDir = const Point(1, 0);
     _model.score = 0;
     _model.foodEaten = 0;
+    _model.foodEatenThisLevel = 0;
+    _model.currentLevel = 1;
+    _model.isLevelComplete = false;
     _model.timeElapsedSec = 0;
-    _model.tickMs = 220; // Starting speed for Level 1 (slower/easier)
+    _model.tickMs = _tickMsForLevel(1); // 600 ms
     _model.isAlive = true;
     _model.isRunning = false;
     _model.isPaused = false;
@@ -153,6 +173,18 @@ class SnakeGameController extends ChangeNotifier {
     _startTimer();
   }
 
+  /// Called from the UI when the player taps "NEXT LEVEL" in the popup.
+  void advanceLevel() {
+    _model.isLevelComplete = false;
+    _model.currentLevel++;
+    _model.foodEatenThisLevel = 0;
+    _model.tickMs = _tickMsForLevel(_model.currentLevel);
+    _model.isRunning = true;
+    notifyListeners();
+    _startTimer();
+  }
+
+  // ── Timer ────────────────────────────────────────────────────────────────────
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(
@@ -174,14 +206,15 @@ class SnakeGameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── Game step ────────────────────────────────────────────────────────────────
   void step() {
-    if (!_model.isAlive || _model.isPaused) return;
+    if (!_model.isAlive || _model.isPaused || _model.isLevelComplete) return;
 
     _model.dir = _model.nextDir;
     final head = _model.snake.first;
     final newHead = Point(head.x + _model.dir.x, head.y + _model.dir.y);
 
-    // Wall wrap-around: snake exits one side and enters from the opposite side
+    // Wall wrap-around
     final wrappedHead = Point(
       (newHead.x + _model.cols) % _model.cols,
       (newHead.y + _model.rows) % _model.rows,
@@ -205,17 +238,20 @@ class SnakeGameController extends ChangeNotifier {
     if (_model.apples.contains(wrappedHead)) {
       _model.score += 10;
       _model.foodEaten += 1;
+      _model.foodEatenThisLevel += 1;
       _model.apples.remove(wrappedHead);
       placeApples();
 
-      // Progressive speed curve calculation:
-      // Level = min(30, (foodEaten ~/ 5) + 1)
-      // Level 1: 220ms (slow, easy startup)
-      // Level 30: 60ms (fast, challenging peak)
-      final currentLevel = min(30, (_model.foodEaten ~/ 5) + 1);
-      _model.tickMs = 220 - ((currentLevel - 1) * 5.5).round();
-
-      _startTimer(); // Restart loop with the new tickMs immediately
+      // Check level completion (20 apples = level complete)
+      if (_model.foodEatenThisLevel >= applesPerLevel) {
+        _model.isLevelComplete = true;
+        _timer?.cancel();
+        _timeTrackerTimer?.cancel();
+        if (_model.score > _model.bestScore) {
+          _model.bestScore = _model.score;
+          _saveBestScore();
+        }
+      }
     } else {
       _model.snake.removeLast();
     }
