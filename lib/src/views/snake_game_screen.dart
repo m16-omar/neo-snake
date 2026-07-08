@@ -318,69 +318,6 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     );
   }
 
-  Widget _buildHUD(
-    TextStyle monoStyle, {
-    required double cellSize,
-    required bool isLandscape,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-      child: SizedBox(
-        width: min(
-          MediaQuery.of(context).size.width * 0.9,
-          _controller.cols * cellSize + 20,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildHUDItem(
-              'SCORE',
-              '${_controller.score}',
-              monoStyle,
-              CrossAxisAlignment.start,
-            ),
-            _buildHUDItem(
-              'BEST',
-              '${_controller.bestScore}',
-              monoStyle,
-              CrossAxisAlignment.end,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHUDItem(
-    String label,
-    String value,
-    TextStyle monoStyle,
-    CrossAxisAlignment crossAxisAlignment,
-  ) {
-    return Column(
-      crossAxisAlignment: crossAxisAlignment,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: monoStyle.copyWith(
-            color: const Color(0xFF5C8A63),
-            fontSize: 11,
-            letterSpacing: 2,
-          ),
-        ),
-        Text(
-          value,
-          style: monoStyle.copyWith(
-            color: const Color(0xFFD4F7D4),
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            shadows: const [Shadow(color: Color(0x6678DC8C), blurRadius: 6)],
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildPauseButton(TextStyle monoStyle, {bool compact = false}) {
     final isPaused = _controller.isPaused;
@@ -521,7 +458,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                 availableHeight = constraints.maxHeight - 70.0;
                 availableWidth = constraints.maxWidth * 0.7 - 40.0;
               } else {
-                availableHeight = constraints.maxHeight - 460.0;
+                availableHeight = constraints.maxHeight - 320.0;
                 availableWidth = constraints.maxWidth - 40.0;
               }
 
@@ -719,39 +656,84 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
               } else {
                 // Portrait Layout
                 return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    // Portrait Top Row (Back Button + Title)
+                    // ── Compact unified top bar ──────────────────────────
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0,
-                        vertical: 8.0,
+                        horizontal: 16.0,
+                        vertical: 6.0,
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _buildBackButton(),
-                          Text(
-                            'NEON SNAKE',
-                            style: monoStyle.copyWith(
-                              color: const Color(0xFF86E0C4),
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 2,
+                          const SizedBox(width: 8),
+                          // Score
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'SCORE',
+                                style: monoStyle.copyWith(
+                                  color: const Color(0xFF5C8A63),
+                                  fontSize: 9,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                              Text(
+                                '${_controller.score}',
+                                style: monoStyle.copyWith(
+                                  color: const Color(0xFFD4F7D4),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          // Title (centred)
+                          Expanded(
+                            child: Text(
+                              'NEON SNAKE',
+                              textAlign: TextAlign.center,
+                              style: monoStyle.copyWith(
+                                color: const Color(0xFF86E0C4),
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 2,
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 38), // Balance spacing
+                          // Best
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'BEST',
+                                style: monoStyle.copyWith(
+                                  color: const Color(0xFF5C8A63),
+                                  fontSize: 9,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                              Text(
+                                '${_controller.bestScore}',
+                                style: monoStyle.copyWith(
+                                  color: const Color(0xFFFFD700),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
-                    _buildHUD(
-                      monoStyle,
-                      cellSize: cellSize,
-                      isLandscape: false,
-                    ),
-                    const SizedBox(height: 8),
+                    // ── Game board ───────────────────────────────────────
                     gameBoard,
                     const SizedBox(height: 8),
+                    // ── Pause button ─────────────────────────────────────
                     Center(
                       child: SizedBox(
                         width: 180,
@@ -759,6 +741,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
+                    // ── D-pad ────────────────────────────────────────────
                     _buildDpad(size: 52.0),
                   ],
                 );
