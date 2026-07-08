@@ -278,12 +278,12 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         // Fixed UI above the D-pad: 4 cards + pause button + spacers
-        // Estimate ~28px per compact card × 4 = 112, pause ~36, spacers ~8
-        const double fixedHeight = 160.0;
+        // Measured actual ≈ 195px, add headroom to prevent overflow
+        const double fixedHeight = 220.0;
         final double remainingHeight =
-            (constraints.maxHeight - fixedHeight).clamp(60.0, 200.0);
-        // D-pad circle = remainingHeight, but cap button size sensibly
-        final double dpadSize = (remainingHeight / 3.4).clamp(26.0, 68.0);
+            (constraints.maxHeight - fixedHeight).clamp(40.0, 180.0);
+        // D-pad circle diameter = dpadSize × 3.4 — cap to avoid overflow
+        final double dpadSize = (remainingHeight / 3.4).clamp(22.0, 52.0);
 
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
