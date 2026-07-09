@@ -10,6 +10,7 @@ class SnakeBoardPainter extends CustomPainter {
   final double cellSize;
   final int cols;
   final int rows;
+  final int level;
 
   SnakeBoardPainter({
     required this.snake,
@@ -19,17 +20,61 @@ class SnakeBoardPainter extends CustomPainter {
     required this.cellSize,
     required this.cols,
     required this.rows,
+    required this.level,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Draw Background
-    final bgPaint = Paint()..color = const Color(0xFF16301F);
+    // 5 repeating themes based on level
+    final themeIndex = (level - 1) % 5;
+
+    // 1. Draw Theme-specific Background
+    Color bgColor;
+    switch (themeIndex) {
+      case 0:
+        bgColor = const Color(0xFF0F1E16); // Dark Jungle Green
+        break;
+      case 1:
+        bgColor = const Color(0xFF1D0E0A); // Dark Arcade Rust
+        break;
+      case 2:
+        bgColor = const Color(0xFF070B16); // Deep Cyber Night
+        break;
+      case 3:
+        bgColor = const Color(0xFF161619); // Dark Charcoal
+        break;
+      case 4:
+        bgColor = const Color(0xFF10071A); // Deep Purple Galaxy
+        break;
+      default:
+        bgColor = const Color(0xFF16301F);
+    }
+    final bgPaint = Paint()..color = bgColor;
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
 
-    // Draw Grid Lines
+    // 2. Draw Theme-specific Grid Lines
+    Color gridColor;
+    switch (themeIndex) {
+      case 0:
+        gridColor = Colors.black.withOpacity(0.20);
+        break;
+      case 1:
+        gridColor = const Color(0xFFE6402F).withOpacity(0.06);
+        break;
+      case 2:
+        gridColor = const Color(0xFF00E5FF).withOpacity(0.06);
+        break;
+      case 3:
+        gridColor = const Color(0xFFFFD700).withOpacity(0.06);
+        break;
+      case 4:
+        gridColor = const Color(0xFFE040FB).withOpacity(0.06);
+        break;
+      default:
+        gridColor = Colors.black.withOpacity(0.22);
+    }
     final gridPaint = Paint()
-      ..color = Colors.black.withOpacity(0.22)
+      ..color = gridColor
       ..strokeWidth = 1.0;
 
     for (int c = 0; c <= cols; c++) {
@@ -41,49 +86,143 @@ class SnakeBoardPainter extends CustomPainter {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
     }
 
-    // Draw Obstacles
-    final stoneColor = const Color(0xFF757575);
-    final stoneDark = const Color(0xFF424242);
-    final stoneLight = const Color(0xFFBDBDBD);
+    // 3. Draw Obstacles with Unique Visuals per Theme
     for (final obs in obstacles) {
       final px = obs.x * cellSize;
       final py = obs.y * cellSize;
-      final pad = 2.0;
-      final rect = Rect.fromLTWH(
-        px + pad,
-        py + pad,
-        cellSize - pad * 2,
-        cellSize - pad * 2,
-      );
-      final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(5));
 
-      final stonePaint = Paint()..color = stoneColor;
-      canvas.drawRRect(rrect, stonePaint);
+      if (themeIndex == 0) {
+        // Theme 0: Classic Stone
+        final stoneColor = const Color(0xFF757575);
+        final stoneDark = const Color(0xFF424242);
+        final stoneLight = const Color(0xFFBDBDBD);
+        final rect = Rect.fromLTWH(px + 2, py + 2, cellSize - 4, cellSize - 4);
+        final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(5));
+        canvas.drawRRect(rrect, Paint()..color = stoneColor);
+        canvas.drawRRect(
+          rrect,
+          Paint()
+            ..color = stoneDark
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.5,
+        );
+        canvas.drawLine(
+          Offset(px + 4, py + 4),
+          Offset(px + cellSize - 4, py + 4),
+          Paint()..color = stoneLight..strokeWidth = 1.0,
+        );
+        canvas.drawLine(
+          Offset(px + 4, py + 4),
+          Offset(px + 4, py + cellSize - 4),
+          Paint()..color = stoneLight..strokeWidth = 1.0,
+        );
+      } else if (themeIndex == 1) {
+        // Theme 1: Retro Brick
+        final brickColor = const Color(0xFF9E3D2F);
+        final brickBorder = const Color(0xFF4A1A13);
+        final rect = Rect.fromLTWH(px + 1.5, py + 1.5, cellSize - 3, cellSize - 3);
+        final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(3));
+        canvas.drawRRect(rrect, Paint()..color = brickColor);
+        final strokePaint = Paint()
+          ..color = brickBorder
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5;
+        canvas.drawRRect(rrect, strokePaint);
+        // Center mortar line
+        canvas.drawLine(
+          Offset(px + 1.5, py + cellSize / 2),
+          Offset(px + cellSize - 1.5, py + cellSize / 2),
+          strokePaint,
+        );
+        // Split lines
+        canvas.drawLine(
+          Offset(px + cellSize / 3, py + 1.5),
+          Offset(px + cellSize / 3, py + cellSize / 2),
+          strokePaint,
+        );
+        canvas.drawLine(
+          Offset(px + 2 * cellSize / 3, py + cellSize / 2),
+          Offset(px + 2 * cellSize / 3, py + cellSize - 1.5),
+          strokePaint,
+        );
+      } else if (themeIndex == 2) {
+        // Theme 2: Neon Cyber Outline
+        final neonColor = const Color(0xFF00E5FF);
+        final rect = Rect.fromLTWH(px + 3, py + 3, cellSize - 6, cellSize - 6);
+        final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(4));
+        canvas.drawRRect(rrect, Paint()..color = neonColor.withOpacity(0.12));
+        canvas.drawRRect(
+          rrect,
+          Paint()
+            ..color = neonColor
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2.0,
+        );
+        canvas.drawCircle(
+          Offset(px + cellSize / 2, py + cellSize / 2),
+          2.2,
+          Paint()..color = neonColor,
+        );
+      } else if (themeIndex == 3) {
+        // Theme 3: Hazard Striped
+        final yellowColor = const Color(0xFFFFD700);
+        final blackColor = const Color(0xFF1E1E1E);
+        final rect = Rect.fromLTWH(px + 1, py + 1, cellSize - 2, cellSize - 2);
+        final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(2));
+        canvas.drawRRect(rrect, Paint()..color = yellowColor);
 
-      // Dark border
-      final strokePaint = Paint()
-        ..color = stoneDark
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5;
-      canvas.drawRRect(rrect, strokePaint);
+        canvas.save();
+        canvas.clipRRect(rrect);
+        final stripePaint = Paint()
+          ..color = blackColor
+          ..strokeWidth = 3.0;
+        for (double offset = -cellSize; offset < cellSize * 2; offset += 8.0) {
+          canvas.drawLine(
+            Offset(px + offset, py),
+            Offset(px + offset + cellSize, py + cellSize),
+            stripePaint,
+          );
+        }
+        canvas.restore();
 
-      // Light bevel highlights
-      final linePaint = Paint()
-        ..color = stoneLight
-        ..strokeWidth = 1.0;
-      canvas.drawLine(
-        Offset(px + pad + 2, py + pad + 2),
-        Offset(px + cellSize - pad - 2, py + pad + 2),
-        linePaint,
-      );
-      canvas.drawLine(
-        Offset(px + pad + 2, py + pad + 2),
-        Offset(px + pad + 2, py + cellSize - pad - 2),
-        linePaint,
-      );
+        canvas.drawRRect(
+          rrect,
+          Paint()
+            ..color = blackColor
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.2,
+        );
+      } else {
+        // Theme 4: Purple Gem Star
+        final gemColor = const Color(0xFFD500F9);
+        final gemDark = const Color(0xFF4A0072);
+        final cx = px + cellSize / 2;
+        final cy = py + cellSize / 2;
+        final r = cellSize / 2 - 2;
+
+        final path = Path()
+          ..moveTo(cx, cy - r)
+          ..lineTo(cx + r, cy)
+          ..lineTo(cx, cy + r)
+          ..lineTo(cx - r, cy)
+          ..close();
+        canvas.drawPath(path, Paint()..color = gemColor);
+        canvas.drawPath(
+          path,
+          Paint()
+            ..color = gemDark
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.5,
+        );
+        canvas.drawCircle(
+          Offset(cx - 2, cy - 2),
+          1.8,
+          Paint()..color = Colors.white.withOpacity(0.8),
+        );
+      }
     }
 
-    // Draw Apples
+    // 4. Draw Apples
     for (final apple in apples) {
       final cx = (apple.x + 0.5) * cellSize;
       final cy = (apple.y + 0.5) * cellSize;
@@ -124,17 +263,25 @@ class SnakeBoardPainter extends CustomPainter {
       canvas.restore();
     }
 
-    // Draw Snake
-    const bodyColor = Color(0xFF8BC34A);
-    const bodyDark = Color(0xFF6EA037);
-    const headColor = Color(0xFF9CCC55);
-
+    // 5. Draw Snake with Dynamic Scaling and Shapes (Slim/Beaded/Diamond)
     for (int i = snake.length - 1; i >= 0; i--) {
       final seg = snake[i];
       final px = seg.x * cellSize;
       final py = seg.y * cellSize;
       final isHead = i == 0;
-      final pad = isHead ? 1.0 : 2.0;
+
+      double pad;
+      if (themeIndex == 0) {
+        pad = isHead ? 1.0 : 2.0; // Classic chunky
+      } else if (themeIndex == 1) {
+        pad = isHead ? 2.5 : 3.5; // Slim neon
+      } else if (themeIndex == 2) {
+        pad = isHead ? 3.0 : 5.0; // Cyber dots (very thin/tiny snake)
+      } else if (themeIndex == 3) {
+        pad = isHead ? 1.5 : 2.5; // Medium diamond
+      } else {
+        pad = isHead ? 2.8 : 4.8; // Beaded / dotted
+      }
 
       final rect = Rect.fromLTWH(
         px + pad,
@@ -142,38 +289,115 @@ class SnakeBoardPainter extends CustomPainter {
         cellSize - pad * 2,
         cellSize - pad * 2,
       );
-      final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(7));
 
-      final fillPaint = Paint()..color = isHead ? headColor : bodyColor;
-      canvas.drawRRect(rrect, fillPaint);
+      switch (themeIndex) {
+        case 0:
+          // Classic Green
+          final fillPaint = Paint()
+            ..color = isHead ? const Color(0xFF9CCC55) : const Color(0xFF8BC34A);
+          final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(7));
+          canvas.drawRRect(rrect, fillPaint);
+          if (!isHead) {
+            final strokePaint = Paint()
+              ..color = const Color(0xFF6EA037)
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1.4;
+            canvas.drawRRect(rrect, strokePaint);
 
-      if (!isHead) {
-        final strokePaint = Paint()
-          ..color = bodyDark
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.4;
-        canvas.drawRRect(rrect, strokePaint);
+            if (i % 2 == 0) {
+              final scalePad = pad + 3.0;
+              final scaleRect = Rect.fromLTWH(
+                px + scalePad,
+                py + scalePad,
+                cellSize - pad * 2 - 6,
+                (cellSize - pad * 2 - 6) / 2,
+              );
+              final scaleRRect = RRect.fromRectAndRadius(
+                scaleRect,
+                const Radius.circular(3),
+              );
+              canvas.drawRRect(
+                scaleRRect,
+                Paint()..color = Colors.white.withOpacity(0.10),
+              );
+            }
+          }
+          break;
 
-        // Highlight scales
-        if (i % 2 == 0) {
-          final scalePad = pad + 3.0;
-          final scaleRect = Rect.fromLTWH(
-            px + scalePad,
-            py + scalePad,
-            cellSize - pad * 2 - 6,
-            (cellSize - pad * 2 - 6) / 2,
+        case 1:
+          // Slim Neon Orange (Tiny Snake)
+          final fillPaint = Paint()
+            ..color = isHead ? const Color(0xFFFF9100) : const Color(0xFFFF3D00);
+          final cx = px + cellSize / 2;
+          final cy = py + cellSize / 2;
+          final r = (cellSize - pad * 2) / 2;
+          if (isHead) {
+            canvas.drawCircle(
+              Offset(cx, cy),
+              r + 1.2,
+              Paint()..color = const Color(0xFFFF9100).withOpacity(0.35),
+            );
+          }
+          canvas.drawCircle(Offset(cx, cy), r, fillPaint);
+          break;
+
+        case 2:
+          // Cyber Neon Pink Dots
+          final fillPaint = Paint()
+            ..color = isHead ? const Color(0xFFFF4081) : const Color(0xFFF50057);
+          final cx = px + cellSize / 2;
+          final cy = py + cellSize / 2;
+          final w = (cellSize - pad * 2) / 2;
+          final path = Path()
+            ..moveTo(cx, cy - w)
+            ..lineTo(cx + w, cy)
+            ..lineTo(cx, cy + w)
+            ..lineTo(cx - w, cy)
+            ..close();
+          canvas.drawPath(
+            path,
+            Paint()..color = const Color(0xFFF50057).withOpacity(0.3),
           );
-          final scaleRRect = RRect.fromRectAndRadius(
-            scaleRect,
-            const Radius.circular(3),
-          );
-          final scalePaint = Paint()..color = Colors.white.withOpacity(0.10);
-          canvas.drawRRect(scaleRRect, scalePaint);
-        }
+          canvas.drawPath(path, fillPaint);
+          break;
+
+        case 3:
+          // Golden Scale
+          final fillPaint = Paint()
+            ..color = isHead ? const Color(0xFFFFEA00) : const Color(0xFFFFC400);
+          final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(5));
+          canvas.drawRRect(rrect, fillPaint);
+          if (!isHead) {
+            canvas.drawRRect(
+              rrect,
+              Paint()
+                ..color = const Color(0xFFB58A00)
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 1.0,
+            );
+          }
+          break;
+
+        case 4:
+          // Purple Beaded / Dotted
+          final fillPaint = Paint()
+            ..color = isHead ? const Color(0xFFE040FB) : const Color(0xFFD500F9);
+          final cx = px + cellSize / 2;
+          final cy = py + cellSize / 2;
+          final r = (cellSize - pad * 2) / 2;
+          canvas.drawCircle(Offset(cx, cy), r, fillPaint);
+          if (!isHead) {
+            canvas.drawCircle(
+              Offset(cx, cy),
+              r * 0.4,
+              Paint()..color = const Color(0xFFFFFFFF).withOpacity(0.7),
+            );
+          }
+          break;
       }
     }
 
-    // Draw Head Eyes
+    // 6. Draw Head Eyes
     if (snake.isNotEmpty) {
       final head = snake.first;
       final hx = (head.x + 0.5) * cellSize;
@@ -183,42 +407,60 @@ class SnakeBoardPainter extends CustomPainter {
 
       double ex1, ey1, ex2, ey2;
       if (dir.x == 1) {
-        // Right
         ex1 = hx + fwd;
         ey1 = hy - off;
         ex2 = hx + fwd;
         ey2 = hy + off;
       } else if (dir.x == -1) {
-        // Left
         ex1 = hx - fwd;
         ey1 = hy - off;
         ex2 = hx - fwd;
         ey2 = hy + off;
       } else if (dir.y == -1) {
-        // Up
         ex1 = hx - off;
         ey1 = hy - fwd;
         ex2 = hx + off;
         ey2 = hy - fwd;
       } else {
-        // Down
         ex1 = hx - off;
         ey1 = hy + fwd;
         ex2 = hx + off;
         ey2 = hy + fwd;
       }
 
-      final eyePaint = Paint()..color = const Color(0xFF1B3A1B);
-      final pupilPaint = Paint()..color = Colors.white;
+      // Eye & pupil colors match theme
+      Color eyeColor;
+      Color pupilColor = Colors.white;
+      switch (themeIndex) {
+        case 0:
+          eyeColor = const Color(0xFF1B3A1B);
+          break;
+        case 1:
+          eyeColor = const Color(0xFF4A0000);
+          break;
+        case 2:
+          eyeColor = const Color(0xFF0D1B2A);
+          pupilColor = const Color(0xFF00FFCC);
+          break;
+        case 3:
+          eyeColor = const Color(0xFF3E2723);
+          break;
+        case 4:
+          eyeColor = const Color(0xFF2A0D2E);
+          break;
+        default:
+          eyeColor = const Color(0xFF1B3A1B);
+      }
 
-      // Draw eye 1
+      final eyePaint = Paint()..color = eyeColor;
+      final pupilPaint = Paint()..color = pupilColor;
+
       canvas.drawOval(
         Rect.fromCenter(center: Offset(ex1, ey1), width: 5.2, height: 6.8),
         eyePaint,
       );
       canvas.drawCircle(Offset(ex1 - 0.6, ey1 - 1.0), 0.9, pupilPaint);
 
-      // Draw eye 2
       canvas.drawOval(
         Rect.fromCenter(center: Offset(ex2, ey2), width: 5.2, height: 6.8),
         eyePaint,
@@ -233,6 +475,7 @@ class SnakeBoardPainter extends CustomPainter {
         oldDelegate.apples != apples ||
         oldDelegate.obstacles != obstacles ||
         oldDelegate.dir != dir ||
-        oldDelegate.cellSize != cellSize;
+        oldDelegate.cellSize != cellSize ||
+        oldDelegate.level != level;
   }
 }

@@ -533,6 +533,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                               cellSize: cellSize,
                               cols: _controller.cols,
                               rows: _controller.rows,
+                              level: _controller.level,
                             ),
                           ),
                         ),
