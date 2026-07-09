@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/snake_game_model.dart';
+import '../services/audio_service.dart';
 
 class SnakeGameController extends ChangeNotifier {
   final SnakeGameModel _model = SnakeGameModel();
@@ -264,6 +265,11 @@ class SnakeGameController extends ChangeNotifier {
           _model.bestScore = _model.score;
           _saveBestScore();
         }
+        // Play level up sound
+        AudioService.instance.playLevelUp();
+      } else {
+        // Play simple apple pick sound
+        AudioService.instance.playApple();
       }
     } else {
       _model.snake.removeLast();
@@ -280,6 +286,8 @@ class SnakeGameController extends ChangeNotifier {
       _model.bestScore = _model.score;
       _saveBestScore();
     }
+    // Play game over sound
+    AudioService.instance.playGameOver();
   }
 
   void setDir(int x, int y) {
