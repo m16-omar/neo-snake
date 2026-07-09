@@ -173,6 +173,19 @@ class SnakeGameController extends ChangeNotifier {
     _startTimer();
   }
 
+  /// Restart from the level the player was on when they died.
+  /// Score resets but level + speed are preserved.
+  void restartAtCurrentLevel() {
+    final savedLevel = _model.currentLevel;
+    reset(); // resets everything to level 1
+    // Restore level and matching speed
+    _model.currentLevel = savedLevel;
+    _model.tickMs = _tickMsForLevel(savedLevel);
+    _model.isRunning = true;
+    notifyListeners();
+    _startTimer();
+  }
+
   /// Called from the UI when the player taps "NEXT LEVEL" in the popup.
   void advanceLevel() {
     _model.isLevelComplete = false;

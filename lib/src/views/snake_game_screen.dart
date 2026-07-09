@@ -594,8 +594,12 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                                     onPressed: () {
                                       if (_controller.isPaused) {
                                         _controller.togglePause();
-                                      } else {
+                                      } else if (_controller.isAlive) {
+                                        // PLAY — fresh start from level 1
                                         _controller.startGame();
+                                      } else {
+                                        // PLAY AGAIN — restart at the level they died on
+                                        _controller.restartAtCurrentLevel();
                                       }
                                       _focusNode.requestFocus();
                                     },
