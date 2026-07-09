@@ -5,25 +5,29 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
 
 class AudioService {
+  // Singleton pattern
   static final AudioService instance = AudioService._internal();
   AudioService._internal();
 
+  // Distinct players so sound effects don't cut each other off
   final AudioPlayer _playerApple = AudioPlayer();
   final AudioPlayer _playerLevel = AudioPlayer();
   final AudioPlayer _playerGameOver = AudioPlayer();
 
+  // Cached paths for synthesized audio files
   String? _applePath;
   String? _levelPath;
   String? _gameOverPath;
 
   bool _initialized = false;
 
+  // Generates sound waves, writes them as WAV files to the local temp directory,
+  // and caches their file paths for instant playback.
   Future<void> init() async {
     if (_initialized) return;
     try {
       final tempDir = await getTemporaryDirectory();
 
-      // Generate and write WAVs to temporary directory
       final appleFile = File('${tempDir.path}/snake_apple.wav');
       await appleFile.writeAsBytes(_generateAppleWav());
       _applePath = appleFile.path;
@@ -38,11 +42,12 @@ class AudioService {
 
       _initialized = true;
     } catch (e) {
-      // Fail silently without crashing the app
+      // Don't crash if the platform's audio engine or storage fails
       debugPrint('AudioService initialization error: $e');
     }
   }
 
+  // Playback triggers
   void playApple() {
     if (!_initialized || _applePath == null) return;
     _playerApple.play(DeviceFileSource(_applePath!));
