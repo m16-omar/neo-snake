@@ -12,7 +12,7 @@ class SnakeGameController extends ChangeNotifier {
 
   static const String _bestScoreKey = 'snakeBestScore';
 
-  /// Number of apples that must be eaten to complete a level.
+  /// NUMBER OF APPLES THAT MUST BE EATEN TO COMPLETE A LEVEL.
   static const int applesPerLevel = 20;
 
   SnakeGameController() {
@@ -20,7 +20,7 @@ class SnakeGameController extends ChangeNotifier {
     reset();
   }
 
-  // ── Getters ─────────────────────────────────────────────────────────────────
+  // ── GETTERS ─────────────────────────────────────────────────────────────────
   List<Point<int>> get snake => _model.snake;
   Point<int> get dir => _model.dir;
   List<Point<int>> get apples => _model.apples;
@@ -39,7 +39,7 @@ class SnakeGameController extends ChangeNotifier {
   int get cols => _model.cols;
   int get rows => _model.rows;
 
-  // ── Persistence ─────────────────────────────────────────────────────────────
+  // ── PERSISTENCE ─────────────────────────────────────────────────────────────
   @override
   void dispose() {
     _timer?.cancel();
@@ -53,7 +53,7 @@ class SnakeGameController extends ChangeNotifier {
       _model.bestScore = prefs.getInt(_bestScoreKey) ?? 0;
       notifyListeners();
     } catch (e) {
-      debugPrint('Error loading best score: \$e');
+      debugPrint('Error loading best score: $e');
     }
   }
 
@@ -62,21 +62,21 @@ class SnakeGameController extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_bestScoreKey, _model.bestScore);
     } catch (e) {
-      debugPrint('Error saving best score: \$e');
+      debugPrint('Error saving best score: $e');
     }
   }
 
-  // ── Speed curve ─────────────────────────────────────────────────────────────
-  // Level 1 → 600 ms (very slow, newcomer-friendly)
-  // Level 5 → ~528 ms (still comfortable)
-  // Level 10 → ~438 ms
-  // Level 20 → ~258 ms (challenging)
-  // Level 30 → 80 ms (expert)
+  // ── SPEED CURVE ─────────────────────────────────────────────────────────────
+  // LEVEL 1 → 600 MS (VERY SLOW, NEWCOMER-FRIENDLY)
+  // LEVEL 5 → ~528 MS (STILL COMFORTABLE)
+  // LEVEL 10 → ~438 MS
+  // LEVEL 20 → ~258 MS (CHALLENGING)
+  // LEVEL 30 → 80 MS (EXPERT)
   int _tickMsForLevel(int lvl) {
     return max(80, 600 - (lvl - 1) * 18);
   }
 
-  // ── Game lifecycle ───────────────────────────────────────────────────────────
+  // ── GAME LIFECYCLE ───────────────────────────────────────────────────────────
   void reset() {
     final startX = _model.cols ~/ 2;
     final startY = _model.rows ~/ 2;
@@ -93,7 +93,7 @@ class SnakeGameController extends ChangeNotifier {
     _model.currentLevel = 1;
     _model.isLevelComplete = false;
     _model.timeElapsedSec = 0;
-    _model.tickMs = _tickMsForLevel(1); // 600 ms
+    _model.tickMs = _tickMsForLevel(1); // 600 MS
     _model.isAlive = true;
     _model.isRunning = false;
     _model.isPaused = false;
@@ -105,17 +105,17 @@ class SnakeGameController extends ChangeNotifier {
 
   void generateObstacles() {
     _model.obstacles.clear();
-    // Vertical wall top center
+    // VERTICAL WALL TOP CENTER
     int midX = _model.cols ~/ 2;
     _model.obstacles.add(Point(midX, 2));
     _model.obstacles.add(Point(midX, 3));
 
-    // Horizontal wall lower left
+    // HORIZONTAL WALL LOWER LEFT
     _model.obstacles.add(Point(2, _model.rows - 5));
     _model.obstacles.add(Point(3, _model.rows - 5));
     _model.obstacles.add(Point(4, _model.rows - 5));
 
-    // Square wall mid right
+    // SQUARE WALL MID RIGHT
     _model.obstacles.add(Point(_model.cols - 4, _model.rows ~/ 2));
     _model.obstacles.add(Point(_model.cols - 3, _model.rows ~/ 2));
     _model.obstacles.add(Point(_model.cols - 4, _model.rows ~/ 2 + 1));
@@ -174,12 +174,12 @@ class SnakeGameController extends ChangeNotifier {
     _startTimer();
   }
 
-  /// Restart from the level the player was on when they died.
-  /// Score resets but level + speed are preserved.
+  /// RESTART FROM THE LEVEL THE PLAYER WAS ON WHEN THEY DIED.
+  /// SCORE RESETS BUT LEVEL + SPEED ARE PRESERVED.
   void restartAtCurrentLevel() {
     final savedLevel = _model.currentLevel;
-    reset(); // resets everything to level 1
-    // Restore level and matching speed
+    reset(); // RESETS EVERYTHING TO LEVEL 1
+    // RESTORE LEVEL AND MATCHING SPEED
     _model.currentLevel = savedLevel;
     _model.tickMs = _tickMsForLevel(savedLevel);
     _model.isRunning = true;
@@ -187,7 +187,7 @@ class SnakeGameController extends ChangeNotifier {
     _startTimer();
   }
 
-  /// Called from the UI when the player taps "NEXT LEVEL" in the popup.
+  /// CALLED FROM THE UI WHEN THE PLAYER TAPS "NEXT LEVEL" IN THE POPUP.
   void advanceLevel() {
     _model.isLevelComplete = false;
     _model.currentLevel++;
@@ -198,7 +198,7 @@ class SnakeGameController extends ChangeNotifier {
     _startTimer();
   }
 
-  // ── Timer ────────────────────────────────────────────────────────────────────
+  // ── TIMER ────────────────────────────────────────────────────────────────────
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(
@@ -220,7 +220,7 @@ class SnakeGameController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Game step ────────────────────────────────────────────────────────────────
+  // ── GAME STEP ────────────────────────────────────────────────────────────────
   void step() {
     if (!_model.isAlive || _model.isPaused || _model.isLevelComplete) return;
 
@@ -228,19 +228,19 @@ class SnakeGameController extends ChangeNotifier {
     final head = _model.snake.first;
     final newHead = Point(head.x + _model.dir.x, head.y + _model.dir.y);
 
-    // Wall wrap-around
+    // WALL WRAP-AROUND
     final wrappedHead = Point(
       (newHead.x + _model.cols) % _model.cols,
       (newHead.y + _model.rows) % _model.rows,
     );
 
-    // Obstacle collision
+    // OBSTACLE COLLISION
     if (_model.obstacles.any((obs) => obs == wrappedHead)) {
       _gameOver();
       return;
     }
 
-    // Self collision
+    // SELF COLLISION
     if (_model.snake.any((segment) => segment == wrappedHead)) {
       _gameOver();
       return;
@@ -248,7 +248,7 @@ class SnakeGameController extends ChangeNotifier {
 
     _model.snake.insert(0, wrappedHead);
 
-    // Eating apple
+    // EATING APPLE
     if (_model.apples.contains(wrappedHead)) {
       _model.score += 10;
       _model.foodEaten += 1;
@@ -256,7 +256,7 @@ class SnakeGameController extends ChangeNotifier {
       _model.apples.remove(wrappedHead);
       placeApples();
 
-      // Check level completion (20 apples = level complete)
+      // CHECK LEVEL COMPLETION (20 APPLES = LEVEL COMPLETE)
       if (_model.foodEatenThisLevel >= applesPerLevel) {
         _model.isLevelComplete = true;
         _timer?.cancel();
@@ -265,10 +265,10 @@ class SnakeGameController extends ChangeNotifier {
           _model.bestScore = _model.score;
           _saveBestScore();
         }
-        // Play level up sound
+        // PLAY LEVEL UP SOUND
         AudioService.instance.playLevelUp();
       } else {
-        // Play simple apple pick sound
+        // PLAY SIMPLE APPLE PICK SOUND
         AudioService.instance.playApple();
       }
     } else {
@@ -286,13 +286,13 @@ class SnakeGameController extends ChangeNotifier {
       _model.bestScore = _model.score;
       _saveBestScore();
     }
-    // Play game over sound
+    // PLAY GAME OVER SOUND
     AudioService.instance.playGameOver();
   }
 
   void setDir(int x, int y) {
     if (!_model.isAlive || !_model.isRunning || _model.isPaused) return;
-    // Prevent 180 degree turns
+    // PREVENT 180 DEGREE TURNS
     if (_model.dir.x == -x && _model.dir.y == -y) return;
     if (_model.dir.x == x && _model.dir.y == y) return;
     _model.nextDir = Point(x, y);

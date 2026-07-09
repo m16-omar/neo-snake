@@ -13,9 +13,9 @@ class SnakeGameModel {
   int score = 0;
   int bestScore = 0;
   int foodEaten = 0;
-  int foodEatenThisLevel = 0; // resets every level
-  int currentLevel = 1;       // explicit level (not derived)
-  bool isLevelComplete = false; // true when 20 apples eaten in this level
+  int foodEatenThisLevel = 0; // RESETS EVERY LEVEL
+  int currentLevel = 1;       // EXPLICIT LEVEL (NOT DERIVED)
+  bool isLevelComplete = false; // TRUE WHEN 20 APPLES EATEN IN THIS LEVEL
   int timeElapsedSec = 0;
   bool isRunning = false;
   bool isAlive = false;

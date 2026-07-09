@@ -63,47 +63,47 @@ class AudioService {
     _playerGameOver.play(DeviceFileSource(_gameOverPath!));
   }
 
-  // ── WAV Byte Generation ──────────────────────────────────────────────────
+  // ── WAV BYTE GENERATION ──────────────────────────────────────────────────
 
   static Uint8List _createWavBytes({
     required int sampleRate,
     required List<double> samples,
   }) {
-    final int byteLength = samples.length * 2; // 16-bit PCM
+    final int byteLength = samples.length * 2; // 16-BIT PCM
     final byteData = ByteData(44 + byteLength);
 
-    // RIFF header
+    // RIFF HEADER
     byteData.setUint8(0, 0x52); // 'R'
     byteData.setUint8(1, 0x49); // 'I'
     byteData.setUint8(2, 0x46); // 'F'
     byteData.setUint8(3, 0x46); // 'F'
-    byteData.setUint32(4, 36 + byteLength, Endian.little); // Chunk size
+    byteData.setUint32(4, 36 + byteLength, Endian.little); // CHUNK SIZE
     byteData.setUint8(8, 0x57); // 'W'
     byteData.setUint8(9, 0x41); // 'A'
     byteData.setUint8(10, 0x56); // 'V'
     byteData.setUint8(11, 0x45); // 'E'
 
-    // fmt subchunk
+    // FMT SUBCHUNK
     byteData.setUint8(12, 0x66); // 'f'
     byteData.setUint8(13, 0x6d); // 'm'
     byteData.setUint8(14, 0x74); // 't'
     byteData.setUint8(15, 0x20); // ' '
-    byteData.setUint32(16, 16, Endian.little); // Subchunk1 Size
-    byteData.setUint16(20, 1, Endian.little); // AudioFormat (1 = PCM)
-    byteData.setUint16(22, 1, Endian.little); // NumChannels (1 = Mono)
-    byteData.setUint32(24, sampleRate, Endian.little); // SampleRate
-    byteData.setUint32(28, sampleRate * 2, Endian.little); // ByteRate (SampleRate * 1 channel * 16 bits / 8)
-    byteData.setUint16(32, 2, Endian.little); // BlockAlign
-    byteData.setUint16(34, 16, Endian.little); // BitsPerSample (16)
+    byteData.setUint32(16, 16, Endian.little); // SUBCHUNK1 SIZE
+    byteData.setUint16(20, 1, Endian.little); // AUDIOFORMAT (1 = PCM)
+    byteData.setUint16(22, 1, Endian.little); // NUMCHANNELS (1 = MONO)
+    byteData.setUint32(24, sampleRate, Endian.little); // SAMPLERATE
+    byteData.setUint32(28, sampleRate * 2, Endian.little); // BYTERATE (SAMPLERATE * 1 CHANNEL * 16 BITS / 8)
+    byteData.setUint16(32, 2, Endian.little); // BLOCKALIGN
+    byteData.setUint16(34, 16, Endian.little); // BITSPERSAMPLE (16)
 
-    // data subchunk
+    // DATA SUBCHUNK
     byteData.setUint8(36, 0x64); // 'd'
     byteData.setUint8(37, 0x61); // 'a'
     byteData.setUint8(38, 0x74); // 't'
     byteData.setUint8(39, 0x61); // 'a'
     byteData.setUint32(40, byteLength, Endian.little);
 
-    // Write samples
+    // WRITE SAMPLES
     int offset = 44;
     for (final sample in samples) {
       final int intVal = (sample * 32767.0).clamp(-32768.0, 32767.0).toInt();
@@ -114,7 +114,7 @@ class AudioService {
     return byteData.buffer.asUint8List();
   }
 
-  // Coin pick bleep (high frequency sweep)
+  // COIN PICK BLEEP (HIGH FREQUENCY SWEEP)
   static Uint8List _generateAppleWav() {
     const int sampleRate = 22050;
     const double duration = 0.10;
@@ -131,7 +131,7 @@ class AudioService {
     return _createWavBytes(sampleRate: sampleRate, samples: samples);
   }
 
-  // Level complete fanfare
+  // LEVEL COMPLETE FANFARE
   static Uint8List _generateLevelWav() {
     const int sampleRate = 22050;
     final notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
@@ -158,7 +158,7 @@ class AudioService {
     return _createWavBytes(sampleRate: sampleRate, samples: samples);
   }
 
-  // Game over crash/buzz
+  // GAME OVER CRASH/BUZZ
   static Uint8List _generateGameOverWav() {
     const int sampleRate = 22050;
     const double duration = 0.40;

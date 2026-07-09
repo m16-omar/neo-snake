@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// IGNORE_FOR_FILE: DEPRECATED_MEMBER_USE
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../snake_game_screen.dart';
@@ -38,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _animationController.forward();
 
-    // Navigate to game screen after delay
+    // NAVIGATE TO GAME SCREEN AFTER DELAY
     Timer(const Duration(milliseconds: 2800), _navigateToGame);
   }
 
@@ -82,7 +82,7 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Glowing logo image wrapper
+                    // GLOWING LOGO IMAGE WRAPPER
                     Container(
                       width: 140,
                       height: 140,
@@ -127,7 +127,7 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ),
                     const SizedBox(height: 48),
-                    // Small loading bar
+                    // SMALL LOADING BAR
                     SizedBox(
                       width: 120,
                       height: 2,

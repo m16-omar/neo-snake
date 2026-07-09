@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// IGNORE_FOR_FILE: DEPRECATED_MEMBER_USE
 import 'dart:math';
 import 'package:flutter/material.dart';
 
@@ -25,26 +25,26 @@ class SnakeBoardPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // 5 repeating themes based on level
+    // 5 REPEATING THEMES BASED ON LEVEL
     final themeIndex = (level - 1) % 5;
 
-    // 1. Draw Theme-specific Background
+    // 1. DRAW THEME-SPECIFIC BACKGROUND
     Color bgColor;
     switch (themeIndex) {
       case 0:
-        bgColor = const Color(0xFF0F1E16); // Dark Jungle Green
+        bgColor = const Color(0xFF0F1E16); // DARK JUNGLE GREEN
         break;
       case 1:
-        bgColor = const Color(0xFF1D0E0A); // Dark Arcade Rust
+        bgColor = const Color(0xFF1D0E0A); // DARK ARCADE RUST
         break;
       case 2:
-        bgColor = const Color(0xFF070B16); // Deep Cyber Night
+        bgColor = const Color(0xFF070B16); // DEEP CYBER NIGHT
         break;
       case 3:
-        bgColor = const Color(0xFF161619); // Dark Charcoal
+        bgColor = const Color(0xFF161619); // DARK CHARCOAL
         break;
       case 4:
-        bgColor = const Color(0xFF10071A); // Deep Purple Galaxy
+        bgColor = const Color(0xFF10071A); // DEEP PURPLE GALAXY
         break;
       default:
         bgColor = const Color(0xFF16301F);
@@ -52,7 +52,7 @@ class SnakeBoardPainter extends CustomPainter {
     final bgPaint = Paint()..color = bgColor;
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
 
-    // 2. Draw Theme-specific Grid Lines
+    // 2. DRAW THEME-SPECIFIC GRID LINES
     Color gridColor;
     switch (themeIndex) {
       case 0:
@@ -86,13 +86,13 @@ class SnakeBoardPainter extends CustomPainter {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
     }
 
-    // 3. Draw Obstacles with Unique Visuals per Theme
+    // 3. DRAW OBSTACLES WITH UNIQUE VISUALS PER THEME
     for (final obs in obstacles) {
       final px = obs.x * cellSize;
       final py = obs.y * cellSize;
 
       if (themeIndex == 0) {
-        // Theme 0: Classic Stone
+        // THEME 0: CLASSIC STONE
         final stoneColor = const Color(0xFF757575);
         final stoneDark = const Color(0xFF424242);
         final stoneLight = const Color(0xFFBDBDBD);
@@ -117,7 +117,7 @@ class SnakeBoardPainter extends CustomPainter {
           Paint()..color = stoneLight..strokeWidth = 1.0,
         );
       } else if (themeIndex == 1) {
-        // Theme 1: Retro Brick
+        // THEME 1: RETRO BRICK
         final brickColor = const Color(0xFF9E3D2F);
         final brickBorder = const Color(0xFF4A1A13);
         final rect = Rect.fromLTWH(px + 1.5, py + 1.5, cellSize - 3, cellSize - 3);
@@ -128,13 +128,13 @@ class SnakeBoardPainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1.5;
         canvas.drawRRect(rrect, strokePaint);
-        // Center mortar line
+        // CENTER MORTAR LINE
         canvas.drawLine(
           Offset(px + 1.5, py + cellSize / 2),
           Offset(px + cellSize - 1.5, py + cellSize / 2),
           strokePaint,
         );
-        // Split lines
+        // SPLIT LINES
         canvas.drawLine(
           Offset(px + cellSize / 3, py + 1.5),
           Offset(px + cellSize / 3, py + cellSize / 2),
@@ -146,7 +146,7 @@ class SnakeBoardPainter extends CustomPainter {
           strokePaint,
         );
       } else if (themeIndex == 2) {
-        // Theme 2: Neon Cyber Outline
+        // THEME 2: NEON CYBER OUTLINE
         final neonColor = const Color(0xFF00E5FF);
         final rect = Rect.fromLTWH(px + 3, py + 3, cellSize - 6, cellSize - 6);
         final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(4));
@@ -164,7 +164,7 @@ class SnakeBoardPainter extends CustomPainter {
           Paint()..color = neonColor,
         );
       } else if (themeIndex == 3) {
-        // Theme 3: Hazard Striped
+        // THEME 3: HAZARD STRIPED
         final yellowColor = const Color(0xFFFFD700);
         final blackColor = const Color(0xFF1E1E1E);
         final rect = Rect.fromLTWH(px + 1, py + 1, cellSize - 2, cellSize - 2);
@@ -193,7 +193,7 @@ class SnakeBoardPainter extends CustomPainter {
             ..strokeWidth = 1.2,
         );
       } else {
-        // Theme 4: Purple Gem Star
+        // THEME 4: PURPLE GEM STAR
         final gemColor = const Color(0xFFD500F9);
         final gemDark = const Color(0xFF4A0072);
         final cx = px + cellSize / 2;
@@ -222,17 +222,17 @@ class SnakeBoardPainter extends CustomPainter {
       }
     }
 
-    // 4. Draw Apples
+    // 4. DRAW APPLES
     for (final apple in apples) {
       final cx = (apple.x + 0.5) * cellSize;
       final cy = (apple.y + 0.5) * cellSize;
       final r = cellSize * 0.36;
 
-      // Red body
+      // RED BODY
       final applePaint = Paint()..color = const Color(0xFFE6402F);
       canvas.drawCircle(Offset(cx, cy), r, applePaint);
 
-      // Reflection
+      // REFLECTION
       final reflectionPaint = Paint()..color = Colors.white.withOpacity(0.25);
       canvas.drawCircle(
         Offset(cx - r * 0.35, cy - r * 0.4),
@@ -240,7 +240,7 @@ class SnakeBoardPainter extends CustomPainter {
         reflectionPaint,
       );
 
-      // Stem
+      // STEM
       final stemPaint = Paint()
         ..color = const Color(0xFF3A7A3A)
         ..strokeWidth = 2.5
@@ -251,7 +251,7 @@ class SnakeBoardPainter extends CustomPainter {
         stemPaint,
       );
 
-      // Leaf
+      // LEAF
       canvas.save();
       canvas.translate(cx + 4, cy - r - 5);
       canvas.rotate(-0.6);
@@ -263,7 +263,7 @@ class SnakeBoardPainter extends CustomPainter {
       canvas.restore();
     }
 
-    // 5. Draw Snake with Dynamic Scaling and Shapes (Slim/Beaded/Diamond)
+    // 5. DRAW SNAKE WITH DYNAMIC SCALING AND SHAPES (SLIM/BEADED/DIAMOND)
     for (int i = snake.length - 1; i >= 0; i--) {
       final seg = snake[i];
       final px = seg.x * cellSize;
@@ -272,15 +272,15 @@ class SnakeBoardPainter extends CustomPainter {
 
       double pad;
       if (themeIndex == 0) {
-        pad = isHead ? 1.0 : 2.0; // Classic chunky
+        pad = isHead ? 1.0 : 2.0; // CLASSIC CHUNKY
       } else if (themeIndex == 1) {
-        pad = isHead ? 2.5 : 3.5; // Slim neon
+        pad = isHead ? 2.5 : 3.5; // SLIM NEON
       } else if (themeIndex == 2) {
-        pad = isHead ? 3.0 : 5.0; // Cyber dots (very thin/tiny snake)
+        pad = isHead ? 3.0 : 5.0; // CYBER DOTS (VERY THIN/TINY SNAKE)
       } else if (themeIndex == 3) {
-        pad = isHead ? 1.5 : 2.5; // Medium diamond
+        pad = isHead ? 1.5 : 2.5; // MEDIUM DIAMOND
       } else {
-        pad = isHead ? 2.8 : 4.8; // Beaded / dotted
+        pad = isHead ? 2.8 : 4.8; // BEADED / DOTTED
       }
 
       final rect = Rect.fromLTWH(
@@ -292,7 +292,7 @@ class SnakeBoardPainter extends CustomPainter {
 
       switch (themeIndex) {
         case 0:
-          // Classic Green
+          // CLASSIC GREEN
           final fillPaint = Paint()
             ..color = isHead ? const Color(0xFF9CCC55) : const Color(0xFF8BC34A);
           final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(7));
@@ -325,7 +325,7 @@ class SnakeBoardPainter extends CustomPainter {
           break;
 
         case 1:
-          // Slim Neon Orange (Tiny Snake)
+          // SLIM NEON ORANGE (TINY SNAKE)
           final fillPaint = Paint()
             ..color = isHead ? const Color(0xFFFF9100) : const Color(0xFFFF3D00);
           final cx = px + cellSize / 2;
@@ -342,7 +342,7 @@ class SnakeBoardPainter extends CustomPainter {
           break;
 
         case 2:
-          // Cyber Neon Pink Dots
+          // CYBER NEON PINK DOTS
           final fillPaint = Paint()
             ..color = isHead ? const Color(0xFFFF4081) : const Color(0xFFF50057);
           final cx = px + cellSize / 2;
@@ -362,7 +362,7 @@ class SnakeBoardPainter extends CustomPainter {
           break;
 
         case 3:
-          // Golden Scale
+          // GOLDEN SCALE
           final fillPaint = Paint()
             ..color = isHead ? const Color(0xFFFFEA00) : const Color(0xFFFFC400);
           final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(5));
@@ -379,7 +379,7 @@ class SnakeBoardPainter extends CustomPainter {
           break;
 
         case 4:
-          // Purple Beaded / Dotted
+          // PURPLE BEADED / DOTTED
           final fillPaint = Paint()
             ..color = isHead ? const Color(0xFFE040FB) : const Color(0xFFD500F9);
           final cx = px + cellSize / 2;
@@ -397,7 +397,7 @@ class SnakeBoardPainter extends CustomPainter {
       }
     }
 
-    // 6. Draw Head Eyes
+    // 6. DRAW HEAD EYES
     if (snake.isNotEmpty) {
       final head = snake.first;
       final hx = (head.x + 0.5) * cellSize;
@@ -428,7 +428,7 @@ class SnakeBoardPainter extends CustomPainter {
         ey2 = hy + fwd;
       }
 
-      // Eye & pupil colors match theme
+      // EYE & PUPIL COLORS MATCH THEME
       Color eyeColor;
       Color pupilColor = Colors.white;
       switch (themeIndex) {

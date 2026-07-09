@@ -42,7 +42,7 @@ class _DpadButtonState extends State<DpadButton> {
           widget.label,
           style: TextStyle(
             color: const Color(0xFFA8E6B0),
-            fontSize: widget.size * 0.35, // scale font size dynamically
+            fontSize: widget.size * 0.35, // SCALE FONT SIZE DYNAMICALLY
           ),
         ),
       ),

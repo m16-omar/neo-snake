@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// IGNORE_FOR_FILE: DEPRECATED_MEMBER_USE
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,7 +22,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
   void initState() {
     super.initState();
     _controller = SnakeGameController();
-    // Re-render when the controller state changes
+    // RE-RENDER WHEN THE CONTROLLER STATE CHANGES
     _controller.addListener(_onControllerUpdate);
   }
 
@@ -38,7 +38,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     if (mounted) setState(() {});
   }
 
-  // Keyboard Event Handler
+  // KEYBOARD EVENT HANDLER
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
     if (event is KeyDownEvent) {
       final key = event.logicalKey;
@@ -65,7 +65,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     return KeyEventResult.ignored;
   }
 
-  // Touch Gesture Swiping Handler
+  // TOUCH GESTURE SWIPING HANDLER
   void _handlePanStart(DragStartDetails details) {
     _dragStart = details.localPosition;
   }
@@ -80,12 +80,12 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     if (dx.abs() > dy.abs()) {
       if (dx.abs() > swipeThreshold) {
         _controller.setDir(dx > 0 ? 1 : -1, 0);
-        _dragStart = current; // Reset to allow chain-swiping
+        _dragStart = current; // RESET TO ALLOW CHAIN-SWIPING
       }
     } else {
       if (dy.abs() > swipeThreshold) {
         _controller.setDir(0, dy > 0 ? 1 : -1);
-        _dragStart = current; // Reset to allow chain-swiping
+        _dragStart = current; // RESET TO ALLOW CHAIN-SWIPING
       }
     }
   }
@@ -128,7 +128,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // Length
+          // LENGTH
           _buildTopBarItem(
             icon: Icons.gesture,
             iconColor: const Color(0xFF8BC34A),
@@ -138,7 +138,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
             monoStyle: monoStyle,
           ),
           _buildVerticalDivider(),
-          // Food Eaten
+          // FOOD EATEN
           _buildTopBarItem(
             icon: Icons.apple,
             iconColor: const Color(0xFFE6402F),
@@ -148,7 +148,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
             monoStyle: monoStyle,
           ),
           _buildVerticalDivider(),
-          // Time
+          // TIME
           _buildTopBarItem(
             icon: Icons.access_time,
             iconColor: const Color(0xFF00BCD4),
@@ -158,7 +158,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
             monoStyle: monoStyle,
           ),
           _buildVerticalDivider(),
-          // Best
+          // BEST
           _buildTopBarItem(
             icon: Icons.emoji_events,
             iconColor: const Color(0xFFFFD700),
@@ -277,12 +277,12 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
   Widget _buildSidePanel(TextStyle monoStyle) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Fixed UI above the D-pad: 4 cards + pause button + spacers
-        // Measured actual ≈ 195px, add headroom to prevent overflow
+        // FIXED UI ABOVE THE D-PAD: 4 CARDS + PAUSE BUTTON + SPACERS
+        // MEASURED ACTUAL ≈ 195PX, ADD HEADROOM TO PREVENT OVERFLOW
         const double fixedHeight = 220.0;
         final double remainingHeight =
             (constraints.maxHeight - fixedHeight).clamp(40.0, 180.0);
-        // D-pad circle diameter = dpadSize × 3.4 — cap to avoid overflow
+        // D-PAD CIRCLE DIAMETER = DPADSIZE × 3.4 — CAP TO AVOID OVERFLOW
         final double dpadSize = (remainingHeight / 3.4).clamp(22.0, 52.0);
 
         return Column(
@@ -323,7 +323,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
             const SizedBox(height: 6),
             _buildPauseButton(monoStyle, compact: true),
             const SizedBox(height: 6),
-            // D-pad grows to fill remaining space
+            // D-PAD GROWS TO FILL REMAINING SPACE
             _buildDpad(size: dpadSize),
           ],
         );
@@ -388,7 +388,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
       ),
       child: Stack(
         children: [
-          // Up
+          // UP
           Positioned(
             top: 2,
             left: centerOffset,
@@ -398,7 +398,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
               onTap: () => _controller.setDir(0, -1),
             ),
           ),
-          // Left
+          // LEFT
           Positioned(
             left: 2,
             top: centerOffset,
@@ -408,7 +408,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
               onTap: () => _controller.setDir(-1, 0),
             ),
           ),
-          // Down
+          // DOWN
           Positioned(
             bottom: 2,
             left: centerOffset,
@@ -418,7 +418,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
               onTap: () => _controller.setDir(0, 1),
             ),
           ),
-          // Right
+          // RIGHT
           Positioned(
             right: 2,
             top: centerOffset,
@@ -428,7 +428,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
               onTap: () => _controller.setDir(1, 0),
             ),
           ),
-          // Center cap decoration
+          // CENTER CAP DECORATION
           Center(
             child: Container(
               width: size * 0.5,
@@ -469,11 +469,11 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
 
               if (isLandscape) {
                 availableHeight = constraints.maxHeight - 70.0;
-                // Use ~72% of total width (left flex=7 of 10) minus small padding
+                // USE ~72% OF TOTAL WIDTH (LEFT FLEX=7 OF 10) MINUS SMALL PADDING
                 availableWidth = constraints.maxWidth * 0.72 - 24.0;
               } else {
                 availableHeight = constraints.maxHeight - 290.0;
-                availableWidth = constraints.maxWidth - 56.0; // 40 base + 2×8 board margin
+                availableWidth = constraints.maxWidth - 56.0; // 40 BASE + 2×8 BOARD MARGIN
               }
 
               final widthCellSize = availableWidth / _controller.cols;
@@ -539,7 +539,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                         ),
                       ),
 
-                      // Ready / Game Over / Paused Overlays
+                      // READY / GAME OVER / PAUSED OVERLAYS
                       if (!_controller.isRunning || _controller.isPaused)
                         Positioned.fill(
                           child: ClipRRect(
@@ -596,10 +596,10 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                                       if (_controller.isPaused) {
                                         _controller.togglePause();
                                       } else if (_controller.isAlive) {
-                                        // PLAY — fresh start from level 1
+                                        // PLAY — FRESH START FROM LEVEL 1
                                         _controller.startGame();
                                       } else {
-                                        // PLAY AGAIN — restart at the level they died on
+                                        // PLAY AGAIN — RESTART AT THE LEVEL THEY DIED ON
                                         _controller.restartAtCurrentLevel();
                                       }
                                       _focusNode.requestFocus();
@@ -635,7 +635,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                           ),
                         ),
 
-                      // ── Level-Complete Popup ─────────────────────────────
+                      // ── LEVEL-COMPLETE POPUP ─────────────────────────────
                       if (_controller.isLevelComplete)
                         Positioned.fill(
                           child: ClipRRect(
@@ -737,13 +737,13 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Left Column: Back Button + (Top Bar + Game Board)
+                    // LEFT COLUMN: BACK BUTTON + (TOP BAR + GAME BOARD)
                     Expanded(
                       flex: 7,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Top bar row (Back Button + Stats Bar)
+                          // TOP BAR ROW (BACK BUTTON + STATS BAR)
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16.0,
@@ -757,22 +757,22 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                               ],
                             ),
                           ),
-                          // Game Board
+                          // GAME BOARD
                           Expanded(child: Center(child: gameBoard)),
                         ],
                       ),
                     ),
 
-                    // Right Column: Side Panel
+                    // RIGHT COLUMN: SIDE PANEL
                     Expanded(flex: 3, child: _buildSidePanel(monoStyle)),
                   ],
                 );
               } else {
-                // Portrait Layout
+                // PORTRAIT LAYOUT
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    // ── Ultra-compact single-row header ────────────────────
+                    // ── ULTRA-COMPACT SINGLE-ROW HEADER ────────────────────
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12.0,
@@ -780,9 +780,9 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                       ),
                       child: Row(
                         children: [
-                          // Back button (left anchor)
+                          // BACK BUTTON (LEFT ANCHOR)
                           _buildBackButton(),
-                          // Stats centred in remaining space
+                          // STATS CENTRED IN REMAINING SPACE
                           Expanded(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -831,18 +831,18 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                               ],
                             ),
                           ),
-                          // Balancing spacer = back button width
+                          // BALANCING SPACER = BACK BUTTON WIDTH
                           const SizedBox(width: 38),
                         ],
                       ),
                     ),
-                    // ── Game board ─────────────────────────────────────────
+                    // ── GAME BOARD ─────────────────────────────────────────
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: gameBoard,
                     ),
                     const SizedBox(height: 6),
-                    // ── Pause button ─────────────────────────────────────
+                    // ── PAUSE BUTTON ─────────────────────────────────────
                     Center(
                       child: SizedBox(
                         width: 160,
@@ -850,7 +850,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    // ── D-pad ────────────────────────────────────────────
+                    // ── D-PAD ────────────────────────────────────────────
                     _buildDpad(size: 46.0),
                   ],
                 );
