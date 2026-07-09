@@ -5,24 +5,24 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
 
 class AudioService {
-  // Singleton pattern
+  // SINGLETON PATTERN
   static final AudioService instance = AudioService._internal();
   AudioService._internal();
 
-  // Distinct players so sound effects don't cut each other off
+  // DISTINCT PLAYERS SO SOUND EFFECTS DON'T CUT EACH OTHER OFF
   final AudioPlayer _playerApple = AudioPlayer();
   final AudioPlayer _playerLevel = AudioPlayer();
   final AudioPlayer _playerGameOver = AudioPlayer();
 
-  // Cached paths for synthesized audio files
+  // CACHED PATHS FOR SYNTHESIZED AUDIO FILES
   String? _applePath;
   String? _levelPath;
   String? _gameOverPath;
 
   bool _initialized = false;
 
-  // Generates sound waves, writes them as WAV files to the local temp directory,
-  // and caches their file paths for instant playback.
+  // GENERATES SOUND WAVES, WRITES THEM AS WAV FILES TO THE LOCAL TEMP DIRECTORY,
+  // AND CACHES THEIR FILE PATHS FOR INSTANT PLAYBACK.
   Future<void> init() async {
     if (_initialized) return;
     try {
@@ -42,12 +42,12 @@ class AudioService {
 
       _initialized = true;
     } catch (e) {
-      // Don't crash if the platform's audio engine or storage fails
+      // DON'T CRASH IF THE PLATFORM'S AUDIO ENGINE OR STORAGE FAILS
       debugPrint('AudioService initialization error: $e');
     }
   }
 
-  // Playback triggers
+  // PLAYBACK TRIGGERS
   void playApple() {
     if (!_initialized || _applePath == null) return;
     _playerApple.play(DeviceFileSource(_applePath!));
