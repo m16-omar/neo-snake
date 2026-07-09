@@ -173,7 +173,8 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
   }
 
   Widget _buildVerticalDivider() {
-    return Container(height: 20, width: 1, color: const Color(0x1A86E0C4));
+    final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+    return Container(height: isTablet ? 28 : 20, width: 1, color: const Color(0x1A86E0C4));
   }
 
   Widget _buildTopBarItem({
@@ -184,11 +185,12 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     required Color valueColor,
     required TextStyle monoStyle,
   }) {
+    final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: iconColor, size: 16),
-        const SizedBox(width: 8),
+        Icon(icon, color: iconColor, size: isTablet ? 20 : 16),
+        SizedBox(width: isTablet ? 10 : 8),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -197,7 +199,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
               label,
               style: monoStyle.copyWith(
                 color: const Color(0xFF5C8A63),
-                fontSize: 8,
+                fontSize: isTablet ? 11 : 8,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.0,
               ),
@@ -206,7 +208,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
               value,
               style: monoStyle.copyWith(
                 color: valueColor,
-                fontSize: 12,
+                fontSize: isTablet ? 16 : 12,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -225,14 +227,16 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     Widget? trailing,
     bool compact = false,
   }) {
+    final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+    final useCompact = compact && !isTablet;
     return Container(
       margin: EdgeInsets.symmetric(
-        horizontal: 12.0,
-        vertical: compact ? 1.5 : 2.0,
+        horizontal: isTablet ? 16.0 : 12.0,
+        vertical: useCompact ? 1.5 : (isTablet ? 4.0 : 2.0),
       ),
       padding: EdgeInsets.symmetric(
-        horizontal: 10.0,
-        vertical: compact ? 3.0 : 5.0,
+        horizontal: isTablet ? 14.0 : 10.0,
+        vertical: useCompact ? 3.0 : (isTablet ? 8.0 : 5.0),
       ),
       decoration: BoxDecoration(
         color: const Color(0xFF14241B),
@@ -241,8 +245,8 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
       ),
       child: Row(
         children: [
-          Icon(icon, color: iconColor, size: compact ? 16 : 20),
-          SizedBox(width: compact ? 8 : 10),
+          Icon(icon, color: iconColor, size: useCompact ? 16 : (isTablet ? 24 : 20)),
+          SizedBox(width: useCompact ? 8 : (isTablet ? 12 : 10)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,7 +256,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                   label,
                   style: TextStyle(
                     color: const Color(0xFF5C8A63),
-                    fontSize: compact ? 8 : 9,
+                    fontSize: useCompact ? 8 : (isTablet ? 11 : 9),
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.0,
                   ),
@@ -261,7 +265,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                   value,
                   style: TextStyle(
                     color: valueColor,
-                    fontSize: compact ? 12 : 15,
+                    fontSize: useCompact ? 12 : (isTablet ? 18 : 15),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -277,13 +281,14 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
   Widget _buildSidePanel(TextStyle monoStyle) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
         // FIXED UI ABOVE THE D-PAD: 4 CARDS + PAUSE BUTTON + SPACERS
         // MEASURED ACTUAL ≈ 195PX, ADD HEADROOM TO PREVENT OVERFLOW
-        const double fixedHeight = 220.0;
+        final double fixedHeight = isTablet ? 300.0 : 220.0;
         final double remainingHeight =
-            (constraints.maxHeight - fixedHeight).clamp(40.0, 180.0);
+            (constraints.maxHeight - fixedHeight).clamp(40.0, 220.0);
         // D-PAD CIRCLE DIAMETER = DPADSIZE × 3.4 — CAP TO AVOID OVERFLOW
-        final double dpadSize = (remainingHeight / 3.4).clamp(22.0, 52.0);
+        final double dpadSize = (remainingHeight / 3.4).clamp(22.0, isTablet ? 64.0 : 52.0);
 
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -333,10 +338,12 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
 
 
   Widget _buildPauseButton(TextStyle monoStyle, {bool compact = false}) {
+    final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+    final useCompact = compact && !isTablet;
     final isPaused = _controller.isPaused;
     return Container(
       width: double.infinity,
-      margin: EdgeInsets.symmetric(horizontal: compact ? 12.0 : 16.0),
+      margin: EdgeInsets.symmetric(horizontal: useCompact ? 12.0 : (isTablet ? 16.0 : 16.0)),
       child: OutlinedButton.icon(
         onPressed: () {
           _controller.togglePause();
@@ -345,7 +352,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
         style: OutlinedButton.styleFrom(
           backgroundColor: const Color(0xFF14241B),
           side: const BorderSide(color: Color(0x3386E0C4), width: 1.5),
-          padding: EdgeInsets.symmetric(vertical: compact ? 5.0 : 10.0),
+          padding: EdgeInsets.symmetric(vertical: useCompact ? 5.0 : (isTablet ? 14.0 : 10.0)),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
@@ -353,13 +360,13 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
         icon: Icon(
           isPaused ? Icons.play_arrow : Icons.pause,
           color: const Color(0xFF86E0C4),
-          size: compact ? 14 : 16,
+          size: useCompact ? 14 : (isTablet ? 20 : 16),
         ),
         label: Text(
           isPaused ? 'RESUME' : 'PAUSE',
           style: monoStyle.copyWith(
             color: const Color(0xFF86E0C4),
-            fontSize: compact ? 11 : 13,
+            fontSize: useCompact ? 11 : (isTablet ? 15 : 13),
             fontWeight: FontWeight.bold,
             letterSpacing: 2,
           ),
@@ -466,19 +473,22 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
             builder: (context, constraints) {
               final double availableHeight;
               final double availableWidth;
+              final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
 
               if (isLandscape) {
                 availableHeight = constraints.maxHeight - 70.0;
                 // USE ~72% OF TOTAL WIDTH (LEFT FLEX=7 OF 10) MINUS SMALL PADDING
                 availableWidth = constraints.maxWidth * 0.72 - 24.0;
               } else {
-                availableHeight = constraints.maxHeight - 290.0;
-                availableWidth = constraints.maxWidth - 56.0; // 40 BASE + 2×8 BOARD MARGIN
+                availableHeight = constraints.maxHeight - (isTablet ? 380.0 : 290.0);
+                availableWidth = constraints.maxWidth - (isTablet ? 80.0 : 56.0); // 40 BASE + 2×8 BOARD MARGIN
               }
 
               final widthCellSize = availableWidth / _controller.cols;
               final heightCellSize = availableHeight / _controller.rows;
-              final double maxCell = isLandscape ? 26.0 : 30.0;
+              final double maxCell = isLandscape 
+                  ? (isTablet ? 45.0 : 26.0) 
+                  : (isTablet ? 55.0 : 30.0);
               final cellSize = min(
                 maxCell,
                 min(widthCellSize, heightCellSize),
@@ -774,9 +784,9 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                   children: [
                     // ── ULTRA-COMPACT SINGLE-ROW HEADER ────────────────────
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 4.0,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isTablet ? 24.0 : 12.0,
+                        vertical: isTablet ? 12.0 : 4.0,
                       ),
                       child: Row(
                         children: [
@@ -795,9 +805,9 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                                   valueColor: const Color(0xFF86E0C4),
                                   monoStyle: monoStyle,
                                 ),
-                                const SizedBox(width: 6),
+                                SizedBox(width: isTablet ? 16 : 6),
                                 _buildVerticalDivider(),
-                                const SizedBox(width: 6),
+                                SizedBox(width: isTablet ? 16 : 6),
                                 _buildTopBarItem(
                                   icon: Icons.apple,
                                   iconColor: const Color(0xFFE6402F),
@@ -806,9 +816,9 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                                   valueColor: const Color(0xFFE6402F),
                                   monoStyle: monoStyle,
                                 ),
-                                const SizedBox(width: 6),
+                                SizedBox(width: isTablet ? 16 : 6),
                                 _buildVerticalDivider(),
-                                const SizedBox(width: 6),
+                                SizedBox(width: isTablet ? 16 : 6),
                                 _buildTopBarItem(
                                   icon: Icons.star,
                                   iconColor: const Color(0xFFFFD700),
@@ -817,9 +827,9 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                                   valueColor: const Color(0xFFFFD700),
                                   monoStyle: monoStyle,
                                 ),
-                                const SizedBox(width: 6),
+                                SizedBox(width: isTablet ? 16 : 6),
                                 _buildVerticalDivider(),
-                                const SizedBox(width: 6),
+                                SizedBox(width: isTablet ? 16 : 6),
                                 _buildTopBarItem(
                                   icon: Icons.emoji_events,
                                   iconColor: const Color(0xFFFFD700),
@@ -838,20 +848,20 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                     ),
                     // ── GAME BOARD ─────────────────────────────────────────
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: EdgeInsets.symmetric(horizontal: isTablet ? 24.0 : 8.0),
                       child: gameBoard,
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: isTablet ? 18 : 6),
                     // ── PAUSE BUTTON ─────────────────────────────────────
                     Center(
                       child: SizedBox(
-                        width: 160,
+                        width: isTablet ? 240 : 160,
                         child: _buildPauseButton(monoStyle, compact: true),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: isTablet ? 24 : 6),
                     // ── D-PAD ────────────────────────────────────────────
-                    _buildDpad(size: 46.0),
+                    _buildDpad(size: isTablet ? 64.0 : 46.0),
                   ],
                 );
               }
