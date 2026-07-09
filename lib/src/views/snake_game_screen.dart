@@ -480,7 +480,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                 // USE ~72% OF TOTAL WIDTH (LEFT FLEX=7 OF 10) MINUS SMALL PADDING
                 availableWidth = constraints.maxWidth * 0.72 - 24.0;
               } else {
-                availableHeight = constraints.maxHeight - (isTablet ? 380.0 : 290.0);
+                availableHeight = constraints.maxHeight - (isTablet ? 420.0 : 310.0);
                 availableWidth = constraints.maxWidth - (isTablet ? 80.0 : 56.0); // 40 BASE + 2×8 BOARD MARGIN
               }
 
