@@ -1,5 +1,6 @@
 // IGNORE_FOR_FILE: DEPRECATED_MEMBER_USE
 import 'dart:math';
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../controllers/snake_game_controller.dart';
@@ -13,10 +14,11 @@ class SnakeGameScreen extends StatefulWidget {
   State<SnakeGameScreen> createState() => _SnakeGameScreenState();
 }
 
-class _SnakeGameScreenState extends State<SnakeGameScreen> {
+class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProviderStateMixin {
   late final SnakeGameController _controller;
   final FocusNode _focusNode = FocusNode();
   Offset? _dragStart;
+  late final AnimationController _animationController;
 
   @override
   void initState() {
@@ -24,6 +26,13 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     _controller = SnakeGameController();
     // RE-RENDER WHEN THE CONTROLLER STATE CHANGES
     _controller.addListener(_onControllerUpdate);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      _animationController.repeat();
+    }
   }
 
   @override
@@ -31,6 +40,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
     _controller.removeListener(_onControllerUpdate);
     _controller.dispose();
     _focusNode.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -544,6 +554,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> {
                               cols: _controller.cols,
                               rows: _controller.rows,
                               level: _controller.level,
+                              animation: _animationController,
                             ),
                           ),
                         ),

@@ -11,6 +11,7 @@ class SnakeBoardPainter extends CustomPainter {
   final int cols;
   final int rows;
   final int level;
+  final Animation<double>? animation;
 
   SnakeBoardPainter({
     required this.snake,
@@ -21,7 +22,8 @@ class SnakeBoardPainter extends CustomPainter {
     required this.cols,
     required this.rows,
     required this.level,
-  });
+    this.animation,
+  }) : super(repaint: animation);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -150,7 +152,8 @@ class SnakeBoardPainter extends CustomPainter {
         final neonColor = const Color(0xFF00E5FF);
         final rect = Rect.fromLTWH(px + 3, py + 3, cellSize - 6, cellSize - 6);
         final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(4));
-        canvas.drawRRect(rrect, Paint()..color = neonColor.withOpacity(0.12));
+        final pulseGlow = 0.08 + (animation?.value ?? 0.0) * 0.08;
+        canvas.drawRRect(rrect, Paint()..color = neonColor.withOpacity(pulseGlow));
         canvas.drawRRect(
           rrect,
           Paint()
@@ -158,13 +161,14 @@ class SnakeBoardPainter extends CustomPainter {
             ..style = PaintingStyle.stroke
             ..strokeWidth = 2.0,
         );
+        final dotPulse = 1.6 + (animation?.value ?? 0.0) * 1.0;
         canvas.drawCircle(
           Offset(px + cellSize / 2, py + cellSize / 2),
-          2.2,
+          dotPulse,
           Paint()..color = neonColor,
         );
       } else if (themeIndex == 3) {
-        // THEME 3: HAZARD STRIPED
+        // THEME 3: HAZARD STRIPED (ANIMATED SCROLLING STRIPES)
         final yellowColor = const Color(0xFFFFD700);
         final blackColor = const Color(0xFF1E1E1E);
         final rect = Rect.fromLTWH(px + 1, py + 1, cellSize - 2, cellSize - 2);
@@ -176,7 +180,9 @@ class SnakeBoardPainter extends CustomPainter {
         final stripePaint = Paint()
           ..color = blackColor
           ..strokeWidth = 3.0;
-        for (double offset = -cellSize; offset < cellSize * 2; offset += 8.0) {
+        // SHIFT STRIPES OVER TIME FOR A MOVING TAPE EFFECT
+        final animShift = (animation?.value ?? 0.0) * 8.0;
+        for (double offset = -cellSize - 8.0 + animShift; offset < cellSize * 2; offset += 8.0) {
           canvas.drawLine(
             Offset(px + offset, py),
             Offset(px + offset + cellSize, py + cellSize),
@@ -214,19 +220,23 @@ class SnakeBoardPainter extends CustomPainter {
             ..style = PaintingStyle.stroke
             ..strokeWidth = 1.5,
         );
+        // ANIMATE THE REFLECTION TO SHIMMER SLIGHTLY
+        final shimmer = sin((animation?.value ?? 0.0) * pi * 2) * 1.2;
         canvas.drawCircle(
-          Offset(cx - 2, cy - 2),
+          Offset(cx - 2 + shimmer, cy - 2 + shimmer),
           1.8,
           Paint()..color = Colors.white.withOpacity(0.8),
         );
       }
     }
 
-    // 4. DRAW APPLES
+    // 4. DRAW APPLES (ANIMATED PULSING SCALE)
     for (final apple in apples) {
       final cx = (apple.x + 0.5) * cellSize;
       final cy = (apple.y + 0.5) * cellSize;
-      final r = cellSize * 0.36;
+      // CONTINUOUS APPLE SCALE PULSE
+      final pulse = 1.0 + sin((animation?.value ?? 0.0) * pi * 2) * 0.08;
+      final r = cellSize * 0.36 * pulse;
 
       // RED BODY
       final applePaint = Paint()..color = const Color(0xFFE6402F);
@@ -247,17 +257,17 @@ class SnakeBoardPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round;
       canvas.drawLine(
         Offset(cx, cy - r),
-        Offset(cx + 1, cy - r - 5),
+        Offset(cx + 1, cy - r - 5 * pulse),
         stemPaint,
       );
 
       // LEAF
       canvas.save();
-      canvas.translate(cx + 4, cy - r - 5);
+      canvas.translate(cx + 4, cy - r - 5 * pulse);
       canvas.rotate(-0.6);
       final leafPaint = Paint()..color = const Color(0xFF4CAF50);
       canvas.drawOval(
-        Rect.fromCenter(center: Offset.zero, width: 8.0, height: 4.8),
+        Rect.fromCenter(center: Offset.zero, width: 8.0 * pulse, height: 4.8 * pulse),
         leafPaint,
       );
       canvas.restore();
