@@ -11,6 +11,7 @@ class SnakeGameController extends ChangeNotifier {
   Timer? _timeTrackerTimer;
 
   static const String _bestScoreKey = 'snakeBestScore';
+  static const String _animationsEnabledKey = 'snakeAnimationsEnabled';
 
   /// NUMBER OF APPLES THAT MUST BE EATEN TO COMPLETE A LEVEL.
   static const int applesPerLevel = 20;
@@ -38,6 +39,7 @@ class SnakeGameController extends ChangeNotifier {
   int get tickMs => _model.tickMs;
   int get cols => _model.cols;
   int get rows => _model.rows;
+  bool get animationsEnabled => _model.animationsEnabled;
 
   // ── PERSISTENCE ─────────────────────────────────────────────────────────────
   @override
@@ -51,6 +53,7 @@ class SnakeGameController extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       _model.bestScore = prefs.getInt(_bestScoreKey) ?? 0;
+      _model.animationsEnabled = prefs.getBool(_animationsEnabledKey) ?? true;
       notifyListeners();
     } catch (e) {
       debugPrint('Error loading best score: $e');
@@ -63,6 +66,17 @@ class SnakeGameController extends ChangeNotifier {
       await prefs.setInt(_bestScoreKey, _model.bestScore);
     } catch (e) {
       debugPrint('Error saving best score: $e');
+    }
+  }
+
+  Future<void> toggleAnimations() async {
+    _model.animationsEnabled = !_model.animationsEnabled;
+    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_animationsEnabledKey, _model.animationsEnabled);
+    } catch (e) {
+      debugPrint('Error saving animations setting: $e');
     }
   }
 

@@ -21,4 +21,5 @@ class SnakeGameModel {
   bool isAlive = false;
   bool isPaused = false;
   int tickMs = 600;
+  bool animationsEnabled = true;
 }

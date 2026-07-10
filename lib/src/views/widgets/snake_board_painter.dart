@@ -12,6 +12,7 @@ class SnakeBoardPainter extends CustomPainter {
   final int rows;
   final int level;
   final Animation<double>? animation;
+  final bool animationsEnabled;
 
   SnakeBoardPainter({
     required this.snake,
@@ -23,10 +24,12 @@ class SnakeBoardPainter extends CustomPainter {
     required this.rows,
     required this.level,
     this.animation,
-  }) : super(repaint: animation);
+    required this.animationsEnabled,
+  }) : super(repaint: animationsEnabled ? animation : null);
 
   @override
   void paint(Canvas canvas, Size size) {
+    final animValue = animationsEnabled ? (animation?.value ?? 0.0) : 0.0;
     // 5 REPEATING THEMES BASED ON LEVEL
     final themeIndex = (level - 1) % 5;
 
@@ -152,7 +155,7 @@ class SnakeBoardPainter extends CustomPainter {
         final neonColor = const Color(0xFF00E5FF);
         final rect = Rect.fromLTWH(px + 3, py + 3, cellSize - 6, cellSize - 6);
         final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(4));
-        final pulseGlow = 0.08 + (animation?.value ?? 0.0) * 0.08;
+        final pulseGlow = 0.08 + animValue * 0.08;
         canvas.drawRRect(rrect, Paint()..color = neonColor.withOpacity(pulseGlow));
         canvas.drawRRect(
           rrect,
@@ -161,7 +164,7 @@ class SnakeBoardPainter extends CustomPainter {
             ..style = PaintingStyle.stroke
             ..strokeWidth = 2.0,
         );
-        final dotPulse = 1.6 + (animation?.value ?? 0.0) * 1.0;
+        final dotPulse = 1.6 + animValue * 1.0;
         canvas.drawCircle(
           Offset(px + cellSize / 2, py + cellSize / 2),
           dotPulse,
@@ -181,7 +184,7 @@ class SnakeBoardPainter extends CustomPainter {
           ..color = blackColor
           ..strokeWidth = 3.0;
         // SHIFT STRIPES OVER TIME FOR A MOVING TAPE EFFECT
-        final animShift = (animation?.value ?? 0.0) * 8.0;
+        final animShift = animValue * 8.0;
         for (double offset = -cellSize - 8.0 + animShift; offset < cellSize * 2; offset += 8.0) {
           canvas.drawLine(
             Offset(px + offset, py),
@@ -221,7 +224,7 @@ class SnakeBoardPainter extends CustomPainter {
             ..strokeWidth = 1.5,
         );
         // ANIMATE THE REFLECTION TO SHIMMER SLIGHTLY
-        final shimmer = sin((animation?.value ?? 0.0) * pi * 2) * 1.2;
+        final shimmer = sin(animValue * pi * 2) * 1.2;
         canvas.drawCircle(
           Offset(cx - 2 + shimmer, cy - 2 + shimmer),
           1.8,
@@ -235,7 +238,7 @@ class SnakeBoardPainter extends CustomPainter {
       final cx = (apple.x + 0.5) * cellSize;
       final cy = (apple.y + 0.5) * cellSize;
       // CONTINUOUS APPLE SCALE PULSE
-      final pulse = 1.0 + sin((animation?.value ?? 0.0) * pi * 2) * 0.08;
+      final pulse = 1.0 + sin(animValue * pi * 2) * 0.08;
       final r = cellSize * 0.36 * pulse;
 
       // RED BODY

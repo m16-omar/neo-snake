@@ -127,6 +127,34 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProv
     );
   }
 
+  Widget _buildAnimationToggle() {
+    final enabled = _controller.animationsEnabled;
+    return InkWell(
+      onTap: () {
+        _controller.toggleAnimations();
+        _focusNode.requestFocus();
+      },
+      borderRadius: BorderRadius.circular(8.0),
+      child: Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          color: const Color(0xFF14241B),
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(
+            color: enabled ? const Color(0x3386E0C4) : const Color(0x33FF8A6B),
+            width: 1.5,
+          ),
+        ),
+        child: Icon(
+          enabled ? Icons.animation : Icons.play_disabled,
+          color: enabled ? const Color(0xFF86E0C4) : const Color(0xFFFF8A6B),
+          size: 18,
+        ),
+      ),
+    );
+  }
+
   Widget _buildTopBar(TextStyle monoStyle) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
@@ -292,55 +320,83 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProv
     return LayoutBuilder(
       builder: (context, constraints) {
         final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
-        // FIXED UI ABOVE THE D-PAD: 4 CARDS + PAUSE BUTTON + SPACERS
-        // MEASURED ACTUAL ≈ 195PX, ADD HEADROOM TO PREVENT OVERFLOW
-        final double fixedHeight = isTablet ? 300.0 : 220.0;
+        // FIXED UI ABOVE THE D-PAD: 5 CARDS + PAUSE BUTTON + SPACERS
+        // MEASURED ACTUAL ≈ 235PX, ADD HEADROOM TO PREVENT OVERFLOW
+        final double fixedHeight = isTablet ? 340.0 : 260.0;
         final double remainingHeight =
             (constraints.maxHeight - fixedHeight).clamp(40.0, 220.0);
         // D-PAD CIRCLE DIAMETER = DPADSIZE × 3.4 — CAP TO AVOID OVERFLOW
         final double dpadSize = (remainingHeight / 3.4).clamp(22.0, isTablet ? 64.0 : 52.0);
 
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildSideCard(
-              icon: Icons.emoji_events,
-              iconColor: const Color(0xFFFFD700),
-              label: 'BEST SCORE',
-              value: '${_controller.bestScore}',
-              valueColor: const Color(0xFFFFD700),
-              compact: true,
+        return Center(
+          child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildSideCard(
+                  icon: Icons.emoji_events,
+                  iconColor: const Color(0xFFFFD700),
+                  label: 'BEST SCORE',
+                  value: '${_controller.bestScore}',
+                  valueColor: const Color(0xFFFFD700),
+                  compact: true,
+                ),
+                _buildSideCard(
+                  icon: Icons.bar_chart,
+                  iconColor: const Color(0xFF86E0C4),
+                  label: 'SCORE',
+                  value: '${_controller.score}',
+                  valueColor: const Color(0xFF86E0C4),
+                  compact: true,
+                ),
+                _buildSideCard(
+                  icon: Icons.apple,
+                  iconColor: const Color(0xFFE6402F),
+                  label: 'FOOD EATEN',
+                  value: '${_controller.foodEaten}',
+                  valueColor: const Color(0xFFE6402F),
+                  compact: true,
+                ),
+                _buildSideCard(
+                  icon: Icons.star,
+                  iconColor: const Color(0xFFFFD700),
+                  label: 'LEVEL',
+                  value: 'Level ${_controller.level}',
+                  valueColor: const Color(0xFF86E0C4),
+                  compact: true,
+                ),
+                _buildSideCard(
+                  icon: _controller.animationsEnabled ? Icons.animation : Icons.play_disabled,
+                  iconColor: _controller.animationsEnabled ? const Color(0xFF86E0C4) : const Color(0xFFFF8A6B),
+                  label: 'ANIMATIONS',
+                  value: _controller.animationsEnabled ? 'ON' : 'OFF',
+                  valueColor: _controller.animationsEnabled ? const Color(0xFF86E0C4) : const Color(0xFFFF8A6B),
+                  compact: true,
+                  trailing: Transform.scale(
+                    scale: 0.75,
+                    child: Switch(
+                      value: _controller.animationsEnabled,
+                      onChanged: (val) {
+                        _controller.toggleAnimations();
+                        _focusNode.requestFocus();
+                      },
+                      activeColor: const Color(0xFF86E0C4),
+                      activeTrackColor: const Color(0x3386E0C4),
+                      inactiveThumbColor: const Color(0xFFFF8A6B),
+                      inactiveTrackColor: const Color(0x33FF8A6B),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                _buildPauseButton(monoStyle, compact: true),
+                const SizedBox(height: 6),
+                // D-PAD GROWS TO FILL REMAINING SPACE
+                _buildDpad(size: dpadSize),
+              ],
             ),
-            _buildSideCard(
-              icon: Icons.bar_chart,
-              iconColor: const Color(0xFF86E0C4),
-              label: 'SCORE',
-              value: '${_controller.score}',
-              valueColor: const Color(0xFF86E0C4),
-              compact: true,
-            ),
-            _buildSideCard(
-              icon: Icons.apple,
-              iconColor: const Color(0xFFE6402F),
-              label: 'FOOD EATEN',
-              value: '${_controller.foodEaten}',
-              valueColor: const Color(0xFFE6402F),
-              compact: true,
-            ),
-            _buildSideCard(
-              icon: Icons.star,
-              iconColor: const Color(0xFFFFD700),
-              label: 'LEVEL',
-              value: 'Level ${_controller.level}',
-              valueColor: const Color(0xFF86E0C4),
-              compact: true,
-            ),
-            const SizedBox(height: 6),
-            _buildPauseButton(monoStyle, compact: true),
-            const SizedBox(height: 6),
-            // D-PAD GROWS TO FILL REMAINING SPACE
-            _buildDpad(size: dpadSize),
-          ],
+          ),
         );
       },
     );
@@ -555,6 +611,7 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProv
                               rows: _controller.rows,
                               level: _controller.level,
                               animation: _animationController,
+                              animationsEnabled: _controller.animationsEnabled,
                             ),
                           ),
                         ),
@@ -852,8 +909,8 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProv
                               ],
                             ),
                           ),
-                          // BALANCING SPACER = BACK BUTTON WIDTH
-                          const SizedBox(width: 38),
+                          // ANIMATION SETTINGS TOGGLE BUTTON
+                          _buildAnimationToggle(),
                         ],
                       ),
                     ),
