@@ -14,7 +14,8 @@ class SnakeGameScreen extends StatefulWidget {
   State<SnakeGameScreen> createState() => _SnakeGameScreenState();
 }
 
-class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProviderStateMixin {
+class _SnakeGameScreenState extends State<SnakeGameScreen>
+    with SingleTickerProviderStateMixin {
   late final SnakeGameController _controller;
   final FocusNode _focusNode = FocusNode();
   Offset? _dragStart;
@@ -212,7 +213,11 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProv
 
   Widget _buildVerticalDivider() {
     final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
-    return Container(height: isTablet ? 28 : 20, width: 1, color: const Color(0x1A86E0C4));
+    return Container(
+      height: isTablet ? 28 : 20,
+      width: 1,
+      color: const Color(0x1A86E0C4),
+    );
   }
 
   Widget _buildTopBarItem({
@@ -283,7 +288,11 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProv
       ),
       child: Row(
         children: [
-          Icon(icon, color: iconColor, size: useCompact ? 16 : (isTablet ? 24 : 20)),
+          Icon(
+            icon,
+            color: iconColor,
+            size: useCompact ? 16 : (isTablet ? 24 : 20),
+          ),
           SizedBox(width: useCompact ? 8 : (isTablet ? 12 : 10)),
           Expanded(
             child: Column(
@@ -323,10 +332,13 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProv
         // FIXED UI ABOVE THE D-PAD: 5 CARDS + PAUSE BUTTON + SPACERS
         // MEASURED ACTUAL ≈ 235PX, ADD HEADROOM TO PREVENT OVERFLOW
         final double fixedHeight = isTablet ? 340.0 : 260.0;
-        final double remainingHeight =
-            (constraints.maxHeight - fixedHeight).clamp(40.0, 220.0);
+        final double remainingHeight = (constraints.maxHeight - fixedHeight)
+            .clamp(40.0, 220.0);
         // D-PAD CIRCLE DIAMETER = DPADSIZE × 3.4 — CAP TO AVOID OVERFLOW
-        final double dpadSize = (remainingHeight / 3.4).clamp(22.0, isTablet ? 64.0 : 52.0);
+        final double dpadSize = (remainingHeight / 3.4).clamp(
+          22.0,
+          isTablet ? 64.0 : 52.0,
+        );
 
         return Center(
           child: SingleChildScrollView(
@@ -368,11 +380,17 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProv
                   compact: true,
                 ),
                 _buildSideCard(
-                  icon: _controller.animationsEnabled ? Icons.animation : Icons.play_disabled,
-                  iconColor: _controller.animationsEnabled ? const Color(0xFF86E0C4) : const Color(0xFFFF8A6B),
+                  icon: _controller.animationsEnabled
+                      ? Icons.animation
+                      : Icons.play_disabled,
+                  iconColor: _controller.animationsEnabled
+                      ? const Color(0xFF86E0C4)
+                      : const Color(0xFFFF8A6B),
                   label: 'ANIMATIONS',
                   value: _controller.animationsEnabled ? 'ON' : 'OFF',
-                  valueColor: _controller.animationsEnabled ? const Color(0xFF86E0C4) : const Color(0xFFFF8A6B),
+                  valueColor: _controller.animationsEnabled
+                      ? const Color(0xFF86E0C4)
+                      : const Color(0xFFFF8A6B),
                   compact: true,
                   trailing: Transform.scale(
                     scale: 0.75,
@@ -402,14 +420,15 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProv
     );
   }
 
-
   Widget _buildPauseButton(TextStyle monoStyle, {bool compact = false}) {
     final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
     final useCompact = compact && !isTablet;
     final isPaused = _controller.isPaused;
     return Container(
       width: double.infinity,
-      margin: EdgeInsets.symmetric(horizontal: useCompact ? 12.0 : (isTablet ? 16.0 : 16.0)),
+      margin: EdgeInsets.symmetric(
+        horizontal: useCompact ? 12.0 : (isTablet ? 16.0 : 16.0),
+      ),
       child: OutlinedButton.icon(
         onPressed: () {
           _controller.togglePause();
@@ -418,7 +437,9 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProv
         style: OutlinedButton.styleFrom(
           backgroundColor: const Color(0xFF14241B),
           side: const BorderSide(color: Color(0x3386E0C4), width: 1.5),
-          padding: EdgeInsets.symmetric(vertical: useCompact ? 5.0 : (isTablet ? 14.0 : 10.0)),
+          padding: EdgeInsets.symmetric(
+            vertical: useCompact ? 5.0 : (isTablet ? 14.0 : 10.0),
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
@@ -546,14 +567,17 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProv
                 // USE ~72% OF TOTAL WIDTH (LEFT FLEX=7 OF 10) MINUS SMALL PADDING
                 availableWidth = constraints.maxWidth * 0.72 - 24.0;
               } else {
-                availableHeight = constraints.maxHeight - (isTablet ? 420.0 : 310.0);
-                availableWidth = constraints.maxWidth - (isTablet ? 80.0 : 56.0); // 40 BASE + 2×8 BOARD MARGIN
+                availableHeight =
+                    constraints.maxHeight - (isTablet ? 420.0 : 310.0);
+                availableWidth =
+                    constraints.maxWidth -
+                    (isTablet ? 80.0 : 56.0); // 40 BASE + 2×8 BOARD MARGIN
               }
 
               final widthCellSize = availableWidth / _controller.cols;
               final heightCellSize = availableHeight / _controller.rows;
-              final double maxCell = isLandscape 
-                  ? (isTablet ? 45.0 : 26.0) 
+              final double maxCell = isLandscape
+                  ? (isTablet ? 45.0 : 26.0)
                   : (isTablet ? 55.0 : 30.0);
               final cellSize = min(
                 maxCell,
@@ -916,7 +940,9 @@ class _SnakeGameScreenState extends State<SnakeGameScreen> with SingleTickerProv
                     ),
                     // ── GAME BOARD ─────────────────────────────────────────
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: isTablet ? 24.0 : 8.0),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isTablet ? 24.0 : 8.0,
+                      ),
                       child: gameBoard,
                     ),
                     SizedBox(height: isTablet ? 18 : 6),
